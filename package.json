@@ -1,0 +1,52 @@
+{
+  "name": "sveltemoor",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "format": "prettier --write .",
+    "lint": "prettier --check ."
+  },
+  "devDependencies": {
+    "@iconify/svelte": "^4.2.0",
+    "@sveltejs/adapter-node": "^5.2.12",
+    "@sveltejs/enhanced-img": "^0.4.4",
+    "@sveltejs/kit": "^2.20.0",
+    "@sveltejs/vite-plugin-svelte": "^5.0.3",
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/bcrypt": "^5.0.2",
+    "@types/pg": "^8.11.10",
+    "pg": "^8.13.1",
+    "pg-tsquery": "^8.4.2",
+    "postcss": "^8.4.49",
+    "prettier": "^3.4.2",
+    "prettier-plugin-svelte": "^3.3.2",
+    "prettier-plugin-tailwindcss": "^0.6.11",
+    "svelte": "^5.0.0",
+    "svelte-check": "^4.0.0",
+    "svelte-preprocess": "^6.0.3",
+    "tailwindcss": "^4.0.3",
+    "typescript": "^5.5.0",
+    "vite": "^6.2.2"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.709.0",
+    "@aws-sdk/client-ses": "^3.699.0",
+    "@aws-sdk/s3-request-presigner": "^3.709.0",
+    "@tailwindcss/vite": "^4.0.3",
+    "bcrypt": "^5.1.1",
+    "instantsearch.js": "^4.78.3",
+    "meilisearch": "^0.49.0",
+    "mt-latlon": "^0.1.2",
+    "mt-osgridref": "^0.1.0",
+    "node-fetch": "^3.3.2",
+    "sharp": "^0.33.5",
+    "svelte-carousel": "^1.0.25",
+    "svelte-maplibre": "^1.0.0-next.11",
+    "svelte-sonner": "^0.3.28"
+  }
+}

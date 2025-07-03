@@ -1,0 +1,34 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Libre+Franklin:ital,wght@0,100..900;1,100..900&display=swap");
+
+:root {
+  --color-trust-a: #fffcf6;
+  --color-trust-b: #84a98c;
+  --color-trust-c: #52796f;
+  --color-trust-d: #354f52;
+  --color-trust-e: #2f3e46;
+}
+
+body {
+  font-family: "Libre Franklin", serif;
+  font-optical-sizing: auto;
+}
+a.link:link {
+  color: #0000ee; /* Standard blue for unvisited links */
+  text-decoration: underline;
+}
+
+a.link:visited {
+  color: #551a8b; /* Standard purple for visited links */
+  text-decoration: underline;
+}
+
+a.link:hover {
+  color: #ee0000; /* Red on hover */
+  text-decoration: none; /* Remove underline on hover */
+}
+
+a.link:active {
+  color: #ff0000; /* Bright red when active */
+  text-decoration: underline;
+}
