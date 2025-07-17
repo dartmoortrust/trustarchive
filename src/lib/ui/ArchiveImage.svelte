@@ -14,7 +14,7 @@
   const imgproxyurl = "/api/image";
   const recordUrl = `https://dartmoor.blob.core.windows.net/web/w-${record.file_id}`;
 
-  console.log(record.image_transform)
+  console.log(record);
 
   const src = record.file_mime?.startsWith("audio")
     ? "/images/speaker.png"
@@ -54,7 +54,7 @@
       class="relative flex items-center justify-center max-w-full max-h-full p-4"
     >
       <img
-        src={src.replace(`size=${size}`, 'size=1500')}
+        src={src.replace(`size=${size}`, "size=1500")}
         alt=""
         class="max-w-full max-h-[90vh] rounded-lg"
       />
