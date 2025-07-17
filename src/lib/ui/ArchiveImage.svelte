@@ -28,7 +28,7 @@
 
   const src = record.file_mime?.startsWith("audio")
     ? "/images/speaker.png"
-    : `${imgproxyurl}?url=${encodeURIComponent(recordUrl)}&width=${size}&height=${size}&crop=${crop}`;
+    : `${imgproxyurl}?url=${encodeURIComponent(recordUrl)}&size=${size}&crop=${crop}`;
 </script>
 
 {#if record.file_mime?.startsWith("video")}
@@ -63,7 +63,7 @@
       class="relative flex items-center justify-center max-w-full max-h-full p-4"
     >
       <img
-        src={src.replace("w_500", "w_1500")}
+        src={`${imgproxyurl}?url=${encodeURIComponent(recordUrl)}&size=1500&crop=false`}
         alt=""
         class="max-w-full max-h-[90vh] rounded-lg"
       />

@@ -2,78 +2,45 @@ import sharp from "sharp";
 import fs from "fs/promises";
 import path from "path";
 import fetch from "node-fetch";
+import { json, type RequestEvent } from "@sveltejs/kit";
 
-const CACHE_DIR = path.resolve("static/cache");
 const IMAGES_DIR = path.resolve("static/images");
 
-// Ensure cache directory exists
-async function ensureCacheDir() {
-  try {
-    await fs.mkdir(CACHE_DIR, { recursive: true });
-  } catch (err) {
-    console.error("Failed to create cache directory:", err);
-  }
-}
 
-// Generate a unique cache key
-function createCacheKey(url: string, size: number, crop: boolean, r: number) {
-  return (
-    Buffer.from(url).toString("base64").replace(/[/=]/g, "") +
-    `_${size}_${crop}_${r}.jpg`
-  );
-}
+// export async function POST({ request }: RequestEvent) {
+//   try {
+//     const { imageUrl, transform } = await request.json();
+//     if (!imageUrl) {
+//       return json({ error: "Missing Image URL" }, { status: 400 });
+//     }
+    
+//     let imageBuffer: Buffer;
 
-// Serve cached image if available
-async function serveCachedImage(cachePath: string) {
-  try {
-    const cachedImage = await fs.readFile(cachePath);
-    console.log("Serving cached image:", cachePath);
-    return new Response(cachedImage, {
-      headers: {
-        "Content-Type": "image/jpeg",
-        "Cache-Control": "public, max-age=31536000",
-      },
-    });
-  } catch {
-    return null; // Cache not found
-  }
-}
+//     const response = await fetch(imageUrl);
 
-import { json, type RequestEvent } from "@sveltejs/kit";
-export async function POST({ request }: RequestEvent) {
-  try {
-    const { imageUrl, transform } = await request.json();
-    if (!imageUrl) {
-      return json({ error: "Missing Image URL" }, { status: 400 });
-    }
-    if (!transform) {
-      return json({ error: "Missing Transform Options" }, { status: 400 });
-    }
+//     if (!response.ok) {
+//       return json({ error: "Failed to fetch the image" }, { status: 400 });
+//     }
 
-    let imageBuffer: Buffer;
-    const response = await fetch(imageUrl);
-    if (!response.ok) {
-      return json({ error: "Failed to fetch the image" }, { status: 400 });
-    }
-    imageBuffer = Buffer.from(await response.arrayBuffer());
-    const resizedBuffer = await sharp(imageBuffer)
-      .rotate(transform.rotate)
-      .toBuffer();
+//     imageBuffer = Buffer.from(await response.arrayBuffer());
 
-    return new Response(resizedBuffer, {
-      headers: {
-        "Content-Type": "image/jpeg",
-        "Cache-Control": "public, max-age=31536000",
-      },
-    });
-  } catch (e) {
-    console.error(e);
-  }
-}
+//     const resizedBuffer = await sharp(imageBuffer)
+//       .rotate(transform.rotate)
+//       .toBuffer();
+
+//     return new Response(resizedBuffer, {
+//       headers: {
+//         "Content-Type": "image/jpeg",
+//         "Cache-Control": "public, max-age=31536000",
+//       },
+//     });
+//   } catch (e) {
+//     console.error(e);
+//   }
+// }
 
 export async function GET({ url }: RequestEvent) {
   try {
-    await ensureCacheDir();
     const imageUrl = url.searchParams.get("url");
     const crop = url.searchParams.get("crop") === "true" || false;
     const cache = url.searchParams.get("cache") === "true" || false;
@@ -85,18 +52,7 @@ export async function GET({ url }: RequestEvent) {
     if (!imageUrl) {
       return new Response("Missing image URL", { status: 400 });
     }
-
-    const cacheKey = createCacheKey(imageUrl, size, crop, r);
-    const cachedPath = path.join(CACHE_DIR, cacheKey);
-
-    if (cache) {
-      const cachedResponse = await serveCachedImage(cachedPath);
-      if (cachedResponse) {
-        console.log(`Serving cached image: ${cacheKey}`);
-        return cachedResponse;
-      }
-    }
-
+    
     let imageBuffer: Buffer;
 
     if (imageUrl.startsWith("http")) {
@@ -123,15 +79,12 @@ export async function GET({ url }: RequestEvent) {
       .negate(negate)
       .flip(flip)
       .flop(flop)
+      .webp()
       .toBuffer();
-
-    // Cache the processed image
-    await fs.writeFile(cachedPath, resizedBuffer);
-    console.log(`Processed and cached: ${cachedPath}`);
 
     return new Response(resizedBuffer, {
       headers: {
-        "Content-Type": "image/jpeg",
+        "Content-Type": "image/webp",
         "Cache-Control": "public, max-age=31536000",
       },
     });
