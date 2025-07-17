@@ -12,7 +12,6 @@
   import AudioPlayer from "$lib/ui/AudioPlayer.svelte";
   import MobileHidden from "$lib/ui/MobileHidden.svelte";
   import VideoPlayer from "$lib/ui/VideoPlayer.svelte";
-  import FaveButton from "$lib/ui/FaveButton.svelte";
   let { data }: { data: PageData } = $props();
 </script>
 
