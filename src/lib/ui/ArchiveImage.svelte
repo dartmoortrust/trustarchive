@@ -12,7 +12,7 @@
 
   let isOpen = $state(false);
   const imgproxyurl = "/api/image";
-  const recordUrl = `https://dartmoorpublic.lon1.cdn.digitaloceanspaces.com/w-${record.file_id}`;
+  const recordUrl = `https://dartmoor.blob.core.windows.net/web/w-${record.file_id}`;
 
   const getTransforms = () => {
     if (!record.image_transform) {
