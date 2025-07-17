@@ -11,8 +11,8 @@
 </script>
 
 <Seo
-  title={`Search results for ${data.pagination?.q} from the Dartmoor Trust Archive`}
-  description={`Search results for ${data.pagination?.q} from the Dartmoor Trust Archive`}
+  title={`Search results for ${data.pagination.q} from the Dartmoor Trust Archive`}
+  description={`Search results for ${data.pagination.q} from the Dartmoor Trust Archive`}
   image={`https://dartmoorweb.s3.eu-west-1.amazonaws.com/w-${data.results[0]?.file_id || ""}`}
 />
 <div class="container mx-auto py-5 grid md:grid-cols-6 md:gap-5">

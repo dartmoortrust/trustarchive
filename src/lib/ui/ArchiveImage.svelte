@@ -28,7 +28,7 @@
 
   const src = record.file_mime?.startsWith("audio")
     ? "/images/speaker.png"
-    : `${imgproxyurl}/${encodeURIComponent(recordUrl)}/w_${size},${crop ? "h_" + size : null},${getTransforms()}`;
+    : `${imgproxyurl}?url=${encodeURIComponent(recordUrl)}&width=${size}&height=${size}&crop=${crop}`;
 </script>
 
 {#if record.file_mime?.startsWith("video")}
