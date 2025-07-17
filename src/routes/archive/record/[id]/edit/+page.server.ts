@@ -6,7 +6,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
   const sql = `
 		SELECT r.title, r.original_id, r.id, r.file_id, r.detail, ST_asGeoJSON(r.location_geom)::json as geojson, r.caption, r.caption_rear,
-		r.date_year, r.date_month, r.date_day, r.file_mime, r.transcription, r.file_path, c.name as col_name, r.collection_id, 
+		r.date_year, r.date_month, r.date_day, r.file_mime,  r.file_path, c.name as col_name, r.collection_id, 
     r.medium_id, r.image_transform::json
 		from records r 
 		LEFT JOIN collections c on r.collection_id = c.id
@@ -89,7 +89,7 @@ export const actions = {
         JSON.parse(geojson),
         JSON.parse(image_transform),
         locals.session.email,
-        caption_rear
+        caption_rear,
       ];
       await db.query("BEGIN");
       await db.query(UPDATE_RECORD_SQL, UPDATE_RECORD_VALUES);
