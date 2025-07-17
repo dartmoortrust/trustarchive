@@ -7,38 +7,6 @@ import { json, type RequestEvent } from "@sveltejs/kit";
 const IMAGES_DIR = path.resolve("static/images");
 
 
-// export async function POST({ request }: RequestEvent) {
-//   try {
-//     const { imageUrl, transform } = await request.json();
-//     if (!imageUrl) {
-//       return json({ error: "Missing Image URL" }, { status: 400 });
-//     }
-    
-//     let imageBuffer: Buffer;
-
-//     const response = await fetch(imageUrl);
-
-//     if (!response.ok) {
-//       return json({ error: "Failed to fetch the image" }, { status: 400 });
-//     }
-
-//     imageBuffer = Buffer.from(await response.arrayBuffer());
-
-//     const resizedBuffer = await sharp(imageBuffer)
-//       .rotate(transform.rotate)
-//       .toBuffer();
-
-//     return new Response(resizedBuffer, {
-//       headers: {
-//         "Content-Type": "image/jpeg",
-//         "Cache-Control": "public, max-age=31536000",
-//       },
-//     });
-//   } catch (e) {
-//     console.error(e);
-//   }
-// }
-
 export async function GET({ url }: RequestEvent) {
   try {
     const imageUrl = url.searchParams.get("url");
