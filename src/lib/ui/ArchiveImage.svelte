@@ -14,21 +14,12 @@
   const imgproxyurl = "/api/image";
   const recordUrl = `https://dartmoor.blob.core.windows.net/web/w-${record.file_id}`;
 
-  const getTransforms = () => {
-    if (!record.image_transform) {
-      return;
-    }
-    let transforms = "";
-    Object.entries(record.image_transform).forEach((entry) => {
-      const [key, value] = entry;
-      transforms += `${key}_${value},`;
-    });
-    return transforms;
-  };
+  console.log(record.image_transform)
 
   const src = record.file_mime?.startsWith("audio")
     ? "/images/speaker.png"
-    : `${imgproxyurl}?url=${encodeURIComponent(recordUrl)}&size=${size}&crop=${crop}`;
+    : `${imgproxyurl}?url=${encodeURIComponent(recordUrl)}&size=${size}&crop=${crop}&r=${record.image_transform.r}&flip=${record.image_transform.flip}&flop=${record.image_transform.flop}&negate=${record.image_transform.negate}
+    `;
 </script>
 
 {#if record.file_mime?.startsWith("video")}
@@ -63,7 +54,7 @@
       class="relative flex items-center justify-center max-w-full max-h-full p-4"
     >
       <img
-        src={`${imgproxyurl}?url=${encodeURIComponent(recordUrl)}&size=1500&crop=false`}
+        src={src.replace(`size=${size}`, 'size=1500')}
         alt=""
         class="max-w-full max-h-[90vh] rounded-lg"
       />

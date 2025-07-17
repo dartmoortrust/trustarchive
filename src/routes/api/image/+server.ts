@@ -11,7 +11,6 @@ export async function GET({ url }: RequestEvent) {
   try {
     const imageUrl = url.searchParams.get("url");
     const crop = url.searchParams.get("crop") === "true" || false;
-    const cache = url.searchParams.get("cache") === "true" || false;
     const size = parseInt(url.searchParams.get("size") ?? "300", 10) || 300;
     const r = parseInt(url.searchParams.get("r") ?? "0", 10) || 0;
     const negate = url.searchParams.get("negate") === "true" || false;
