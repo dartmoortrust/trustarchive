@@ -15,7 +15,7 @@
   description={`Search results for ${data.pagination?.q} from the Dartmoor Trust Archive`}
   image={`https://dartmoorweb.s3.eu-west-1.amazonaws.com/w-${data.results[0]?.file_id || ""}`}
 />
-<div class="container mx-auto p-5 grid md:grid-cols-6 md:gap-5">
+<div class="container mx-auto py-5 grid md:grid-cols-6 md:gap-5">
   <!-- Sidebar with search and pagination -->
   <div class="space-y-5 md:col-span-2">
     <Heading text="Search the Archive" />
@@ -88,6 +88,8 @@
   <!-- Search results -->
   <div class="col-span-4 space-y-5">
     {#if data.results?.length > 0}
+          <div class="p-2 border-1 border-slate-300">Results are shown with the most relevant records appearing first.</div>
+
       <RecordGrid records={data.results} />
     {:else}
       <Heading level={2} text="Search Tips" />
