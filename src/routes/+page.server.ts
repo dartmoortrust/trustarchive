@@ -1,9 +1,9 @@
-import { getRecord } from "$lib/server/db";
+import { db, getRecord } from "$lib/server/db";
 import type { PageServerLoad } from "./$types";
 
 export const load = (async () => {
-  const record = await getRecord(4567);
+  const events = await db.query("select * from posts");
   return {
-    record,
+    events: events.rows,
   };
 }) satisfies PageServerLoad;
