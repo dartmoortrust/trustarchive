@@ -26,6 +26,7 @@ export async function GET({ url }: RequestEvent) {
       // Fetch remote image
       const response = await fetch(imageUrl);
       if (!response.ok) {
+        console.log(response)
         return new Response("Failed to fetch image", { status: 500 });
       }
       imageBuffer = Buffer.from(await response.arrayBuffer());

@@ -7,21 +7,21 @@
   import type { PageData } from "./$types";
 
   const phoebevents = [
-    {
-      title: "Light in the West",
-      location: "The RWS Gallery, Whitcomb Street, London, WC2 7HA",
-      description:
-        "Celebrating the 25th anniversary of the Academy and the legacy of art in the region. Including paintings from the Newlyn and St Ives schools. See further details at www.southwestacademy.org",
-      image: "3.png",
-      date: "July 18th - July 25th 2025. Daily from 11am to 5pm.",
-    },
-    {
-      title: "Dartmoor - New Horizons",
-      location: "Neadon Barn, Manageton, Devon, TQ13 9UY.",
-      date: "September 6th - 14th. Daily from 10:30am to 4:30pm.",
-      description:
-        "A major exhibition of dartmoor paintings. For more information and map to the location please visit www.devonopenstudios.co.uk",
-    },
+    // {
+    //   title: "Light in the West",
+    //   location: "The RWS Gallery, Whitcomb Street, London, WC2 7HA",
+    //   description:
+    //     "Celebrating the 25th anniversary of the Academy and the legacy of art in the region. Including paintings from the Newlyn and St Ives schools. See further details at www.southwestacademy.org",
+    //   image: "3.png",
+    //   date: "July 18th - July 25th 2025. Daily from 11am to 5pm.",
+    // },
+    // {
+    //   title: "Dartmoor - New Horizons",
+    //   location: "Neadon Barn, Manageton, Devon, TQ13 9UY.",
+    //   date: "September 6th - 14th. Daily from 10:30am to 4:30pm.",
+    //   description:
+    //     "A major exhibition of dartmoor paintings. For more information and map to the location please visit www.devonopenstudios.co.uk",
+    // },
   ];
 
   const events = [
@@ -101,7 +101,7 @@
     />
   </div>
 </div>
-<div
+<!-- <div
   class="gap-5 container mx-auto space-y-10 bg-white p-10 rounded-xl text-slate-80"
 >
   <Heading text="Events" level={2} />
@@ -120,7 +120,7 @@
       </div>
     {/if}
   {/each}
-</div>
+</div> -->
 <div class="grid md:grid-cols-2 gap-5 container md:mx-auto md:px-0 px-5 py-5">
   <!-- <div class="p-5 bg-white rounded-xl text-slate-800">
     <Flex>

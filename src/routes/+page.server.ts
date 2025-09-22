@@ -4,6 +4,6 @@ import type { PageServerLoad } from "./$types";
 export const load = (async () => {
   const events = await db.query("select * from posts");
   return {
-    events: events.rows,
+    events: [],
   };
 }) satisfies PageServerLoad;
