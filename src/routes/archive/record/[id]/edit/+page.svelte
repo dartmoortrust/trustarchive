@@ -245,7 +245,7 @@
                 </select>
               </div>
               <!-- Medium Input -->
-              <div
+              <!-- <div
                 class={`flex-col gap-3 bg-gray-50 p-2 transition-all flex ${formData.medium_id !== originalData.medium_id ? "bg-green-200" : "bg-gray-50"}`}
               >
                 <label class="text-2xl" for="medium_id">Medium</label>
@@ -262,7 +262,7 @@
                     >
                   {/each}[-4, 50]
                 </select>
-              </div>
+              </div> -->
             </div>
             <div class="flex flex-col gap-3">
               <div class="flex">

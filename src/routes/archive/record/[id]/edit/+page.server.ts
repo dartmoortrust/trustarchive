@@ -6,10 +6,11 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
   const sql = `
 		SELECT r.title, r.original_id, r.id, r.file_id, r.detail, ST_asGeoJSON(r.location_geom)::json as geojson, r.caption, r.caption_rear,
-		r.date_year, r.date_month, r.date_day, r.file_mime,  r.file_path, c.name as col_name, r.collection_id, 
+		r.date_year, r.date_month, r.date_day, f.mime_type as file_mime,  ARRAY_TO_STRING(f.file_paths, ',') as file_path, c.name as col_name, r.collection_id, 
     r.medium_id, r.image_transform::json
 		from records r 
-		LEFT JOIN collections c on r.collection_id = c.id
+		JOIN collections c on r.collection_id = c.id
+    JOIN files f on r.file_id = f.id
 		where r.id = $1
 		LIMIT 1
 	`;
