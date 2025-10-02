@@ -14,11 +14,9 @@
   const imgproxyurl = "/api/image";
   const recordUrl = `https://dartmoor.blob.core.windows.net/public/${record.file_id.slice(0, 2)}/w-${record.file_id}`;
 
-  console.log(record);
-
   const src = record.file_mime?.startsWith("audio")
     ? "/images/speaker.png"
-    : `${imgproxyurl}?url=${encodeURIComponent(recordUrl)}&size=${size}&crop=${crop}&r=${record.image_transform.r}&flip=${record.image_transform.flip}&flop=${record.image_transform.flop}&negate=${record.image_transform.negate}
+    : `${imgproxyurl}?url=${encodeURIComponent(recordUrl)}&size=${size}&crop=${crop}&r=${record.image_transform?.r || 0}&flip=${record.image_transform?.flip}&flop=${record.image_transform?.flop}&negate=${record.image_transform?.negate}
     `;
 </script>
 

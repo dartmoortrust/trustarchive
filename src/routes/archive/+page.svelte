@@ -3,11 +3,7 @@
   import type { PageData } from "./$types";
   import SearchForm from "$lib/ui/SearchForm.svelte";
   import Seo from "$lib/ui/SEO.svelte";
-  import Carousel from "svelte-carousel";
-  import { browser } from "$app/environment";
-  import ArchiveImage from "$lib/ui/ArchiveImage.svelte";
   import Flex from "$lib/ui/Flex.svelte";
-
   let { data }: { data: PageData } = $props();
 
   // Centralize commonly used data
@@ -49,7 +45,7 @@
     </p>
   </Flex>
   <Flex>
-    <Heading text="Some Random Records" level={2} />
+    <!-- <Heading text="Some Random Records" level={2} />
 
     {#if data.records}
       <section class="space-y-5 md:flex hidden">
@@ -71,7 +67,7 @@
           </Carousel>
         {/if}
       </section>
-    {/if}
+    {/if} -->
 
     <Heading text="Search the Archive" level={2} />
     <SearchForm />

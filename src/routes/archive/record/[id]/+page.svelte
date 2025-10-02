@@ -70,5 +70,6 @@
         estimated={data.record.location_estimated}
       />
     </div>
+    {JSON.stringify(data.record)}
   </div>
 {/if}
