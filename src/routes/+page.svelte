@@ -50,7 +50,29 @@
     </h1>
   </Hero>
 </div>
-
+<div class="grid md:grid-cols-1 gap-5 container md:mx-auto md:px-0 px-5 py-5">
+  <div
+    class="gap-10 bg-white p-10 rounded-xl text-slate-800 gap-10 flex flex-col "
+  >
+    <Heading
+      text="Can you identify this Dartmoor cottage?"
+      level={2}
+    />
+    <img src="/images/cottage.webp" alt="Mystery Cottage" class="rounded-xl"/>
+    
+      <p>
+        We were recently given this photograph of a cottage on Dartmoor but it comes with a mystery - we don't know where it is! If you can help us identify the location please get in touch via our contact page.
+      </p>
+      <p>The only clues we have are:</p>
+      <ul class="list-disc list-inside">
+        <li>Possibly dated in the 1940s.</li>
+        <li>Letters 'S' and 'O' are scratched onto the back of the painting.</li>
+        <li>The frame had the full name ' Marcelle Geloso ' on the back.</li>
+        <li>There are no other buildings visible nearby</li>
+        </ul>
+        <p>Please email us if you know any more about this <a href="mailto:secretary@dartmoortrust.org">secretary@dartmoortrust.org</a> </p>
+    </div>
+  </div>
 <div class="grid md:grid-cols-2 gap-5 container md:mx-auto md:px-0 px-5 py-5">
   <div
     class="col-span-2 grid grid-cols-3 gap-10 bg-white p-10 rounded-xl text-slate-800"
