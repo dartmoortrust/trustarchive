@@ -2,6 +2,20 @@ import { Auth } from "$lib/server/auth";
 import { redirect } from "@sveltejs/kit";
 import type { Handle } from "@sveltejs/kit";
 
+// Extend Locals type to include session
+declare global {
+  namespace App {
+    interface Locals {
+      session: {
+        id: string;
+        email: string;
+        roles: string[];
+        name: string;
+      } | null;
+    }
+  }
+}
+
 export const handle: Handle = async ({ event, resolve }) => {
   const sessionId = event.cookies.get("sessionId");
 
