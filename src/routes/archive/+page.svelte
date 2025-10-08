@@ -49,30 +49,6 @@
     </p>
   </Flex>
   <Flex>
-    <Heading text="Some Random Records" level={2} />
-
-    {#if data.records}
-      <section class="space-y-5 md:flex hidden">
-        {#if browser}
-          <Carousel
-            particlesToShow={3}
-            particlesToScroll={2}
-            autoplayDuration={3000}
-            arrows={false}
-          >
-            {#each data.records as record}
-              <a
-                href={`/archive/record/${record.id}`}
-                data-sveltekit-preload-data="false"
-              >
-                <ArchiveImage {record} size={200} crop />
-              </a>
-            {/each}
-          </Carousel>
-        {/if}
-      </section>
-    {/if}
-
     <Heading text="Search the Archive" level={2} />
     <SearchForm />
     <p>

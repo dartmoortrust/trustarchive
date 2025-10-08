@@ -16,7 +16,7 @@
   </Flex>
   <Flex>
     <Image
-      imagesrc={`https://dartmoorasset.s3.eu-west-1.amazonaws.com/${data.trustee.image_url}`}
+      imagesrc={`https://dartmoor.blob.core.windows.net/assets/${data.trustee.image_url}`}
       alt={data.trustee.name}
       grow
     />

@@ -2,15 +2,11 @@ import { db } from "$lib/server/db";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ cookies }) => {
-  const records = await db.query(`
-        SELECT id, image_transform, file_id, file_mime from records where public = true and file_mime is not null order by RANDOM() limit 10
-`);
   const collections = await db.query(
     `select id, name, slug from collections where public = true  order by name `,
   );
 
   return {
-    records: records.rows,
     collections: collections.rows,
   };
 };

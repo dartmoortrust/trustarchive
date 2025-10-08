@@ -155,7 +155,7 @@
         >
           <div class="rounded-t-xl overflow-hidden">
             <Image
-              imagesrc={`https://dartmoorasset.s3.eu-west-1.amazonaws.com/${trustee.image_url}`}
+              imagesrc={`https://dartmoor.blob.core.windows.net/assets/${trustee.image_url}`}
               alt={trustee.name}
               grow
             />
