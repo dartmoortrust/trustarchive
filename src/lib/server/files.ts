@@ -1,3 +1,4 @@
+import { AZURE_KEY } from "$env/static/private";
 import {
   BlobServiceClient,
   StorageSharedKeyCredential,
@@ -6,8 +7,7 @@ import {
 } from "@azure/storage-blob";
 
 const accountName = "dartmoor";
-const accountKey =
-  "D8mEHK7vekHkqvbRRqtrK45SDFYW8fI3QM0/iWPDiBblaR+9QI13ehpNF6ZMAdgLni3okK/K7yax+AStAphArw==";
+const accountKey = AZURE_KEY;
 
 export const keyToBlobName = (key: string) => {
   return `${key.slice(0, 2)}/${key}`;
