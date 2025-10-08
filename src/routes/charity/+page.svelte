@@ -205,7 +205,7 @@
     </p>
     <Button
       text="Download an Application Form"
-      href="https://dartmoorasset.s3.eu-west-1.amazonaws.com/documents/DartmoorTrustGrantApplicationForm.pdf"
+      href="https://dartmoor.blob.core.windows.net/assets/DartmoorTrustGrantApplication.doc"
     />
     <Heading text="Donations" level={2} />
     <p class="">
