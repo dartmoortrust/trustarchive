@@ -13,9 +13,10 @@
   import MobileHidden from "$lib/ui/MobileHidden.svelte";
   import VideoPlayer from "$lib/ui/VideoPlayer.svelte";
   let { data }: { data: PageData } = $props();
+  console.log(data.record);
 </script>
 
-{#if !data.record.public}
+{#if data.record.public == false}
   <div>This record is not public</div>
 {:else}
   <Seo

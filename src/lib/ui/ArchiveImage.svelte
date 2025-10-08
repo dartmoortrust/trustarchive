@@ -12,7 +12,7 @@
 
   let isOpen = $state(false);
   const imgproxyurl = "/api/image";
-  const recordUrl = `https://dartmoor.blob.core.windows.net/public/${record.file_id.slice(0, 2)}/w-${record.file_id}`;
+  const recordUrl = `https://dartmoor.blob.core.windows.net/public/${record.file_id?.slice(0, 2)}/w-${record.file_id}`;
 
   console.log(record);
 
