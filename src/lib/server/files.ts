@@ -7,7 +7,7 @@ import {
   BlobSASPermissions,
 } from "@azure/storage-blob";
 
-const accountName = "dartmoor";
+const accountName = env.AZURE_NAME;
 const accountKey = env.AZURE_KEY;
 
 export const keyToBlobName = (key: string) => {
