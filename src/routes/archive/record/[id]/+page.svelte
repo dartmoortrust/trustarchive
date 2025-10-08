@@ -36,11 +36,11 @@
           icon={"solar:inbox-outline"}
           href={`/archive/collection/${data.record.colslug}`}
         />
-        <RecordInfo
+        <!-- <RecordInfo
           label="Tell us more"
           icon={"solar:lightbulb-minimalistic-linear"}
           href={`/archive/record/${data.record.id}/feedback`}
-        />
+        /> -->
         {#if data.record.date_day || data.record.date_month || data.record.date_year}
           <RecordInfo
             label={`${data.record.date_day || "?"}/${data.record.date_month || "?"}/${data.record.date_year || "?"}`}
