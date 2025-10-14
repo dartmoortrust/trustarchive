@@ -7,6 +7,7 @@
   poster="https://dartmoortrust.org/images/speaker.png"
   id="videoplayer"
   crossorigin="anonymous"
+  class="w-full"
   controls
   {src}
 >
