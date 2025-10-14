@@ -22,7 +22,7 @@
   <Seo
     title={data.record?.title || "Dartmoor Trust Archive"}
     description={data.record?.title || "Dartmoor Trust Archive"}
-    image={`https://dartmoorpublic.lon1.digitaloceanspaces.com/w-${data.record?.file_id || ""}`}
+    image={`https://dartmoor.blob.core.windows.net/public/w-${data.record?.file_id || ""}`}
   />
   <div class="md:hidden">
     <ArchiveImage record={data.record} grow={true} />

@@ -1,5 +1,6 @@
 <script lang="ts">
   let { record } = $props();
+  const src = `https://dartmoor.blob.core.windows.net/public/${record.file_id?.slice(0, 2)}/w-${record.file_id}`;
 </script>
 
 <video
@@ -7,7 +8,7 @@
   id="videoplayer"
   crossorigin="anonymous"
   controls
-  src={`https://dartmoorweb.s3.eu-west-1.amazonaws.com/w-${record.file_id}`}
+  {src}
 >
   <track
     id="subtitleTrack"
