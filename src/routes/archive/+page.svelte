@@ -3,9 +3,6 @@
   import type { PageData } from "./$types";
   import SearchForm from "$lib/ui/SearchForm.svelte";
   import Seo from "$lib/ui/SEO.svelte";
-  import Carousel from "svelte-carousel";
-  import { browser } from "$app/environment";
-  import ArchiveImage from "$lib/ui/ArchiveImage.svelte";
   import Flex from "$lib/ui/Flex.svelte";
 
   let { data }: { data: PageData } = $props();
@@ -63,13 +60,13 @@
     {#if data.collections.length > 0}
       <Heading text="Our Collections" level={2} />
       <div class="flex flex-wrap gap-1">
-        {#each data.collections as { slug, name }}
+        {#each data.collections as { title, code }}
           <a
             class="bg-gray-50 px-2 py-1 hover:bg-gray-200 transition"
-            href={`/archive/collection/${slug}`}
+            href={`/archive/collection/${code}`}
             data-sveltekit-preload-data="false"
           >
-            {name}
+            {title}
           </a>
         {/each}
       </div>

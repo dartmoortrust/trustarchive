@@ -18,7 +18,7 @@
   class="container flex flex-col mx-auto md:grid grid-cols-6 p-5 md:px-0 gap-5"
 >
   <div class="flex flex-col md:col-span-2 gap-5">
-    <Heading text={data.collection.name + " Collection"} />
+    <Heading text={data.collection.title + " Collection"} />
     <div class="flex-rows gap-4 text-gray-800 space-y-3">
       {#if data.collection.description}
         <div class="flex flex-col gap-3">
@@ -53,7 +53,7 @@
       totalPages={data.pagination.page_count}
       onPageChange={(page) => {
         goto(
-          `/archive/collection/${data.collection.slug}?page=${page}&per_page=${data.pagination.per_page}`,
+          `/archive/collection/${data.collection.code}?page=${page}&per_page=${data.pagination.per_page}`,
         );
       }}
     />

@@ -2,8 +2,6 @@ import { db } from "$lib/server/db";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params, locals }) => {
-  console.log("Loading Record Edit: ", params.id);
-
   const sql = `
 		SELECT r.title, r.original_id, r.id, r.file_id, r.detail, ST_asGeoJSON(r.location_geom)::json as geojson, r.caption, r.caption_rear,
 		r.date_year, r.date_month, r.date_day, f.mime_type as file_mime,  ARRAY_TO_STRING(f.file_paths, ',') as file_path, c.name as col_name, r.collection_id, 
@@ -21,7 +19,6 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     "select id, updated_at, title from records where updated_by = $1 order by updated_at DESC",
     [locals?.session.email],
   );
-  console.log(past_edits);
   return {
     record: data.rows[0],
     collections: collections.rows,

@@ -2,20 +2,11 @@
   import Heading from "$lib/ui/Heading.svelte";
   import RecordGrid from "$lib/ui/RecordGrid.svelte";
   import type { PageData } from "./$types";
-  import { enhance } from "$app/forms";
-  import Seo from "$lib/ui/SEO.svelte";
   import Icon from "@iconify/svelte";
-  import SearchHistory from "$lib/ui/SearchHistory.svelte";
-  import Button from "$lib/ui/Button.svelte";
   let { data }: { data: PageData } = $props();
 </script>
 
-<Seo
-  title={`Search results for ${data.pagination.q} from the Dartmoor Trust Archive`}
-  description={`Search results for ${data.pagination.q} from the Dartmoor Trust Archive`}
-  image={`https://dartmoorweb.s3.eu-west-1.amazonaws.com/w-${data.results[0]?.file_id || ""}`}
-/>
-<div class="container mx-auto py-5 grid md:grid-cols-6 md:gap-5">
+<div class="container mx-auto py-5 grid md:grid-cols-6 md:gap-10">
   <!-- Sidebar with search and pagination -->
   <div class="space-y-5 md:col-span-2">
     <Heading text="Search the Archive" />
@@ -40,7 +31,7 @@
         </span>
       </div>
 
-      {#if data.pagination.page_count > 1}
+      {#if data.pagination && data.pagination.page_count > 1}
         <div class="hidden md:flex gap-2 md:flex-wrap">
           {#each Array.from( { length: data.pagination.page_count }, ) as _, pageIndex}
             <a
@@ -57,12 +48,7 @@
       {/if}
     {/if}
 
-    <form
-      class="space-y-3"
-      use:enhance={({ formElement, formData, action, cancel, submitter }) => {
-        console.log(formData);
-      }}
-    >
+    <form>
       <input
         name="q"
         value={data.pagination?.q ?? ""}
@@ -80,33 +66,18 @@
         <option value={50}>50 results per page</option>
         <option value={100}>100 results per page</option>
       </select>
-      <Button text="Search" />
+      <button
+        class="p-2 border-2 bg-green-700 text-white hover:cursor-pointer"
+        type="submit">Search</button
+      >
     </form>
-    <SearchHistory history={data.history} />
   </div>
 
   <!-- Search results -->
   <div class="col-span-4 space-y-5">
-    {#if data.results?.length > 0}
-          <div class="p-2 border-1 border-slate-300">Results are shown with the most relevant records appearing first.</div>
-
-      <RecordGrid records={data.results} />
-    {:else}
-      <Heading level={2} text="Search Tips" />
-      <p>You can control your search with the following approaches:</p>
-      <p>
-        <strong>"Snow Train"</strong> will search for both <b>snow</b> and
-        <b>train</b>.
-      </p>
-      <p>
-        <strong>"Snow -Train"</strong> will search for records with
-        <b>snow</b>
-        but <i>not</i> <b>train</b>.
-      </p>
-      <p>
-        Use an asterisk <strong>Christ*</strong> as a wildcard (e.g.,
-        <i>Christow</i>, <i>Christmas</i>, <i>Christian</i>).
-      </p>
-    {/if}
+    <div class="p-2 border-1 border-slate-300">
+      Results are shown with the most relevant records appearing first.
+    </div>
+    <RecordGrid records={data.results} />
   </div>
 </div>

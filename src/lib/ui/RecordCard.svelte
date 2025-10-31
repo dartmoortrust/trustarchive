@@ -3,7 +3,7 @@
   let { record } = $props();
 </script>
 
-{#if record.file_mime.startsWith("video") || record.file_mime.startsWith("audio")}
+{#if record.mime_type.startsWith("video") || record.mime_type.startsWith("audio")}
   <a
     href={`/archive/record/${record.id}`}
     aria-label="Link to archive record"

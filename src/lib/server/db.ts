@@ -11,9 +11,9 @@ export const db = new Pool({
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  // ssl: {
+  //   rejectUnauthorized: false,
+  // },
 });
 
 export const getFile = async (file_id: string) => {
@@ -22,9 +22,7 @@ export const getFile = async (file_id: string) => {
     const values = [file_id];
     const data = await db.query(sql, values);
     return data.rows[0];
-  } catch (err) {
-    console.log(err);
-  }
+  } catch (err) {}
 };
 
 export const getCollection = async () => {
@@ -52,9 +50,7 @@ export const getRandomRecords = async (count: number) => {
     const values = [count];
     const data = await db.query(sql, values);
     return data.rows;
-  } catch (err) {
-    console.log(err);
-  }
+  } catch (err) {}
 };
 
 export const saveComment = async (
@@ -70,7 +66,5 @@ export const saveComment = async (
 		`;
     const data = await db.query(sql, [record_id, name, comment, email]);
     //await sendEmail();
-  } catch (err) {
-    console.log(err);
-  }
+  } catch (err) {}
 };

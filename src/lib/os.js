@@ -867,7 +867,6 @@ export const latLng2OSGB = (lng, lat) => {
 export const OSGB2latLng = (gridref) => {
   const osgb = new GT_OSGB();
   osgb.parseGridRef(gridref);
-  console.log(osgb.getWGS84());
   // const wgs84 = new GT_WGS84();
   // wgs84.setDegrees(lat, lng);
   // const osgb = wgs84.getOSGB();

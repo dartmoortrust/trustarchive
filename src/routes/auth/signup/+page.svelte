@@ -18,7 +18,6 @@
       method="POST"
       use:enhance={({ formElement, formData, action, cancel }) => {
         return async ({ result }) => {
-          console.log(result);
           if (result.type === "success") {
             goto("/");
           } else {

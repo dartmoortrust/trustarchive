@@ -16,7 +16,6 @@ export const actions = {
       }
 
       const result = await Auth.signup(email, password, name);
-      console.log(result);
       cookies.set("sessionId", result.sessionId, {
         path: "/",
         httpOnly: true,

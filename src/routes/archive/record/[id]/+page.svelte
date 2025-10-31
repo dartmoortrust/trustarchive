@@ -12,8 +12,9 @@
   import AudioPlayer from "$lib/ui/AudioPlayer.svelte";
   import MobileHidden from "$lib/ui/MobileHidden.svelte";
   import VideoPlayer from "$lib/ui/VideoPlayer.svelte";
+  import Markdown from "$lib/ui/Markdown.svelte";
+  import Container from "$lib/ui/Container.svelte";
   let { data }: { data: PageData } = $props();
-  console.log(data.record);
 </script>
 
 {#if data.record.public == false}
@@ -22,54 +23,54 @@
   <Seo
     title={data.record?.title || "Dartmoor Trust Archive"}
     description={data.record?.title || "Dartmoor Trust Archive"}
-    image={`https://dartmoor.blob.core.windows.net/public/w-${data.record?.file_id || ""}`}
   />
   <div class="md:hidden">
     <ArchiveImage record={data.record} grow={true} />
   </div>
-  <div class="flex md:grid grid-cols-2 p-5 md:px-0 md:gap-5 container mx-auto">
-    <Flex>
-      <Heading text={data.record.title} />
-      <Grid cols={2} gap={6}>
-        <RecordInfo
-          label={data.record.colname + " Collection"}
-          icon={"solar:inbox-outline"}
-          href={`/archive/collection/${data.record.colslug}`}
-        />
-        <!-- <RecordInfo
-          label="Tell us more"
-          icon={"solar:lightbulb-minimalistic-linear"}
-          href={`/archive/record/${data.record.id}/feedback`}
-        /> -->
-        {#if data.record.date_day || data.record.date_month || data.record.date_year}
+  <Container>
+    <div class="flex md:grid grid-cols-2 md:px-0 md:gap-20 container mx-auto">
+      <Flex>
+        <Heading text={data.record.title} />
+        <Grid cols={2} gap={10}>
           <RecordInfo
-            label={`${data.record.date_day || "?"}/${data.record.date_month || "?"}/${data.record.date_year || "?"}`}
-            icon={"solar:calendar-outline"}
+            label={data.record.colname + " Collection"}
+            icon={"solar:inbox-outline"}
+            href={`/archive/collection/${data.record.colslug}`}
           />
+
+          {#if data.record.date_day || data.record.date_month || data.record.date_year}
+            <RecordInfo
+              label={`${data.record.date_day || "?"}/${data.record.date_month || "?"}/${data.record.date_year || "?"}`}
+              icon={"solar:calendar-outline"}
+            />
+          {/if}
+          <DownloadButton record={data.record} />
+          <EditButton record={data.record} />
+        </Grid>
+        <div class="flex flex-col text-lg gap-10 py-5 space-y-5">
+          {#if data.record.detail}
+            {@html data.record.detail}
+          {/if}
+          {#if data.record.ai_markdown}
+            <Markdown md={data.record.ai_markdown} />
+          {/if}
+        </div>
+      </Flex>
+      <div>
+        {#if data.record.mime_type.startsWith("audio")}
+          <AudioPlayer record={data.record} />
+        {:else if data.record.mime_type.startsWith("video")}
+          <VideoPlayer record={data.record} />
+        {:else}
+          <MobileHidden>
+            <ArchiveImage record={data.record} crop={false} />
+          </MobileHidden>
         {/if}
-        <DownloadButton record={data.record} />
-        <EditButton record={data.record} />
-        <!-- <FaveButton fave /> -->
-      </Grid>
-      <div class="text-lg space-y-3">
-        {data.record.detail ||
-          "We do not have any further information on this record - if you know something, please let us know. You can use the button above or email secretary@dartmoortrust.org"}
+        <Map
+          geojson={data.record.geojson}
+          estimated={data.record.location_estimated}
+        />
       </div>
-    </Flex>
-    <div>
-      {#if data.record.file_mime.startsWith("audio")}
-        <AudioPlayer record={data.record} />
-      {:else if data.record.file_mime.startsWith("video")}
-        <VideoPlayer record={data.record} />
-      {:else}
-        <MobileHidden>
-          <ArchiveImage record={data.record} crop={false} />
-        </MobileHidden>
-      {/if}
-      <Map
-        geojson={data.record.geojson}
-        estimated={data.record.location_estimated}
-      />
     </div>
-  </div>
+  </Container>
 {/if}

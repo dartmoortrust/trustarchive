@@ -54,14 +54,11 @@
 
       if (!response.ok) {
         const errorData = await response.json(); // Or response.text()
-        console.log(errorData);
         throw new Error(errorData.message || response.statusText);
       }
       const result = await response.json(); // Process successful response
-      console.log("Success:", result);
       toast.success("Your edits have been saved!");
     } catch (error) {
-      console.error("Error:", error);
       toast.error("An error has occured");
     }
   }
@@ -284,7 +281,6 @@
             <div class="col-span-3">
               <MapLibre
                 onclick={(e) => {
-                  console.log(e.lngLat);
                   formData.geojson = {
                     type: "Point",
                     coordinates: [e.lngLat.lng, e.lngLat.lat],

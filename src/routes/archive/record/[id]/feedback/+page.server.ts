@@ -23,7 +23,6 @@ export const actions = {
     const data = await request.formData();
     const token = data.get("cf-turnstile-response");
     const ip = request.headers.get("CF-Connecting-IP");
-    console.log(token);
     // Validate the token by calling the "/siteverify" API.
     let formData = new FormData();
     formData.append("secret", env.CF_SECRET);
@@ -39,7 +38,6 @@ export const actions = {
     );
 
     const outcome = await result.json();
-    console.log(outcome);
     if (outcome.success) {
       await db.query(
         `INSERT INTO comments(record_id, comment, name, email) values ($1,$2,$3,$4)`,

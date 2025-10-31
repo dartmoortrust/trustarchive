@@ -11,20 +11,18 @@
   } = $props();
 
   let isOpen = $state(false);
-  const imgproxyurl = "/api/image";
-  const recordUrl = `https://dartmoor.blob.core.windows.net/public/${record.file_id?.slice(0, 2)}/w-${record.file_id}`;
+  const imgproxyurl = `https://boxes.dartmoortrust.org:8080/insecure/rs:fill:${size}:${size}/plain/`;
+  const recordUrl = `https://dartmoor.blob.core.windows.net/web/${record.id?.slice(0, 2)}/w-${record.id}`;
 
-  console.log(record);
-
-  const src = record.file_mime?.startsWith("audio")
+  const src = record.mime_type?.startsWith("audio")
     ? "/images/speaker.png"
-    : `${imgproxyurl}?url=${encodeURIComponent(recordUrl)}&size=${size}&crop=${crop}&r=${record.image_transform.r}&flip=${record.image_transform.flip}&flop=${record.image_transform.flop}&negate=${record.image_transform.negate}
+    : `${imgproxyurl}${recordUrl}
     `;
 </script>
 
-{#if record.file_mime?.startsWith("video")}
+{#if record.mime_type?.startsWith("video")}
   <Icon icon="solar:videocamera-outline" class="w-full h-full p-8 bg-white" />
-{:else if record.file_mime?.startsWith("audio")}
+{:else if record.mime_type?.startsWith("audio")}
   <Icon
     icon="solar:headphones-round-sound-bold"
     class="w-full h-full p-8 bg-white"

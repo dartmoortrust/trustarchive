@@ -3,7 +3,6 @@ import { redirect } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params, locals }) => {
-  console.log(locals);
   if (!locals.session.roles.includes("admin")) {
     redirect(307, "/auth/login");
   }
@@ -22,7 +21,6 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     ),
     await db.query(`select * from comments order by created_at desc`),
   ]);
-  console.log(users);
   return {
     past_edits: past_edits.rows,
     users: users.rows,

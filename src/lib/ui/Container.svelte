@@ -1,8 +1,7 @@
 <script lang="ts">
-  let { children, verticalpad = 10 } = $props();
-  const verticalpadding = `py-${verticalpad}`;
+  let { children } = $props();
 </script>
 
-<div class={`container md:mx-auto ${verticalpadding}`}>
+<div class={`container mx-auto`}>
   {@render children?.()}
 </div>

@@ -20,7 +20,6 @@
         method="POST"
         use:enhance={({ formElement, formData, action, cancel }) => {
           return async ({ result }) => {
-            console.log(result);
             if (result.type === "success") {
               message = result.data.message;
             } else {
@@ -40,7 +39,6 @@
         action="?/sendemail"
         use:enhance={({ formElement, formData, action, cancel }) => {
           return async ({ result }) => {
-            console.log(result);
             if (result.type === "success") {
               message = "Please check your email.";
             } else {

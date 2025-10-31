@@ -22,7 +22,7 @@
   <Toaster position="top-center" />
   <Navbar />
 
-  <main class="flex-1 text-gray-800 bg-[#f7f7f7]">
+  <main class="flex-1 text-gray-800 bg-gray-50">
     {@render children()}
   </main>
 
