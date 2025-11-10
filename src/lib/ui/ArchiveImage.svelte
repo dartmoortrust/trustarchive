@@ -11,23 +11,24 @@
   } = $props();
 
   let isOpen = $state(false);
-  const imgproxyurl = "/api/image";
-  const recordUrl = `https://dartmoor.blob.core.windows.net/public/${record.file_id?.slice(0, 2)}/w-${record.file_id}`;
+  const imgproxyurl = `http://boxes.dartmoortrust.org/insecure/rs:fill:${size}:${size}/plain/`;
+  const recordUrl = `https://dartmoor.blob.core.windows.net/public/${record?.file_id.slice(0, 2)}/w-${record.file_id}`;
 
-  console.log(record);
-
-  const src = record.file_mime?.startsWith("audio")
+  const src = record.mimeType?.startsWith("audio")
     ? "/images/speaker.png"
-    : `${imgproxyurl}?url=${encodeURIComponent(recordUrl)}&size=${size}&crop=${crop}&r=${record.image_transform.r}&flip=${record.image_transform.flip}&flop=${record.image_transform.flop}&negate=${record.image_transform.negate}
+    : `${imgproxyurl}${recordUrl}
     `;
 </script>
 
-{#if record.file_mime?.startsWith("video")}
-  <Icon icon="solar:videocamera-outline" class="w-full h-full p-8 bg-white" />
-{:else if record.file_mime?.startsWith("audio")}
+{#if record.medium === "video"}
+  <Icon
+    icon="solar:videocamera-outline"
+    class="w-[200px] h-auto p-8 bg-white"
+  />
+{:else if record.medium === "audio"}
   <Icon
     icon="solar:headphones-round-sound-bold"
-    class="w-full h-full p-8 bg-white"
+    class="w-[200px] h-full p-8 bg-white"
   />
 {:else}
   <button
@@ -54,7 +55,7 @@
       class="relative flex items-center justify-center max-w-full max-h-full p-4"
     >
       <img
-        src={src.replace(`size=${size}`, "size=1500")}
+        src={src.replace(`rs:fill:${size}:${size}`, "rs:fill:1500:1500")}
         alt=""
         class="max-w-full max-h-[90vh] rounded-lg"
       />

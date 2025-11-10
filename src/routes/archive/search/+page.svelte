@@ -5,7 +5,6 @@
   import { enhance } from "$app/forms";
   import Seo from "$lib/ui/SEO.svelte";
   import Icon from "@iconify/svelte";
-  import SearchHistory from "$lib/ui/SearchHistory.svelte";
   import Button from "$lib/ui/Button.svelte";
   let { data }: { data: PageData } = $props();
 </script>
@@ -57,12 +56,7 @@
       {/if}
     {/if}
 
-    <form
-      class="space-y-3"
-      use:enhance={({ formElement, formData, action, cancel, submitter }) => {
-        console.log(formData);
-      }}
-    >
+    <form class="space-y-3">
       <input
         name="q"
         value={data.pagination?.q ?? ""}
@@ -80,15 +74,16 @@
         <option value={50}>50 results per page</option>
         <option value={100}>100 results per page</option>
       </select>
-      <Button text="Search" />
+      <button class="p-2 bg-green-800 text-white" type="submit">Search</button>
     </form>
-    <SearchHistory history={data.history} />
   </div>
 
   <!-- Search results -->
   <div class="col-span-4 space-y-5">
     {#if data.results?.length > 0}
-          <div class="p-2 border-1 border-slate-300">Results are shown with the most relevant records appearing first.</div>
+      <div class="p-2 border-1 border-slate-300">
+        Results are shown with the most relevant records appearing first.
+      </div>
 
       <RecordGrid records={data.results} />
     {:else}
