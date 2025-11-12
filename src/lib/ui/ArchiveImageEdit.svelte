@@ -8,7 +8,7 @@
   {#key JSON.stringify(formData.image_transform)}
     <ArchiveImage record={formData} />
   {/key}
-  <div class="absolute top-0 flex gap-1">
+  <!-- <div class="absolute top-0 flex gap-1">
     <button
       type="button"
       class="p-2 flex items-center bg-blue-700 text-white"
@@ -66,5 +66,5 @@
           : (formData.image_transform["x"] = true);
       }}><Icon icon="ri:flip-vertical-2-line" /></button
     >
-  </div>
+  </div> -->
 </div>

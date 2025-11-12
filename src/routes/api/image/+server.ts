@@ -6,7 +6,6 @@ import { json, type RequestEvent } from "@sveltejs/kit";
 
 const IMAGES_DIR = path.resolve("static/images");
 
-
 export async function GET({ url }: RequestEvent) {
   try {
     const imageUrl = url.searchParams.get("url");
@@ -19,14 +18,14 @@ export async function GET({ url }: RequestEvent) {
     if (!imageUrl) {
       return new Response("Missing image URL", { status: 400 });
     }
-    
+
     let imageBuffer: Buffer;
 
     if (imageUrl.startsWith("http")) {
       // Fetch remote image
       const response = await fetch(imageUrl);
       if (!response.ok) {
-        console.log(response)
+        console.log(response);
         return new Response("Failed to fetch image", { status: 500 });
       }
       imageBuffer = Buffer.from(await response.arrayBuffer());
