@@ -5,7 +5,7 @@ export const load: PageServerLoad = async ({ url, params }) => {
   console.log(`Loading collection: ${params.slug}`);
 
   const collection = await db.query(
-    `SELECT * from collections where slug = $1`,
+    `SELECT code as slug, title,description, id from fonds where code = $1`,
     [params.slug], // Fixed: Use `slug` instead of `id`
   );
 
@@ -19,13 +19,13 @@ export const load: PageServerLoad = async ({ url, params }) => {
 
   const records = await db.query(
     `
-    SELECT r.title, r.id, r.file_id, r.detail, ST_asGeoJSON(r.location_geom)::json as geojson, 
-           count(*) OVER()::int AS full_count, r.file_mime,
-           r.date_year, r.date_month, r.date_day, r.file_mime, r.image_transform
-    FROM records r 
+    SELECT r.title, r.id,  r.detail, ST_asGeoJSON(r.location_geom)::json as geojson, 
+           count(*) OVER()::int AS full_count, r.date_year, r.date_month, r.date_day, 
+           r.mime_type as file_mime, r.sha1_hash
+    FROM files r 
     WHERE r.collection_id = $1
       AND r.public = true
-    ORDER BY r.original_id, r.id
+    ORDER BY  r.id
     OFFSET $2
     LIMIT $3
     `,

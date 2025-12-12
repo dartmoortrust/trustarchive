@@ -4,4 +4,5 @@
     //const s3url = "https://dartmoorpublic.lon1.cdn.digitaloceanspaces.com/w-";
     const src = `${imgproxyurl}?url=${imagesrc}&width=${width}&height=${height}&crop=${crop}`;
 </script>
-<img {src} {alt} class={`${grow ? 'w-full': ''}`} />
+
+<img {src} {alt} class={`${grow ? "w-full" : ""}`} />

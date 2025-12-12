@@ -11,12 +11,13 @@
   } = $props();
 
   let isOpen = $state(false);
-  const imgproxyurl = `http://boxes.dartmoortrust.org/insecure/rs:fill:${size}:${size}/plain/`;
-  const recordUrl = `https://dartmoor.blob.core.windows.net/public/${record?.file_id.slice(0, 2)}/w-${record.file_id}`;
+  const imgproxyurl = `https://boxes.dartmoortrust.org/insecure/rs:fill:${size}:${size}/plain/`;
+  const recordUrl = `https://dartmoor.blob.core.windows.net/public/${record?.sha1_hash.slice(0, 2)}/w-${record?.sha1_hash}`;
 
-  const src = record.mimeType?.startsWith("audio")
-    ? "/images/speaker.png"
-    : `${imgproxyurl}${recordUrl}
+  const src =
+    record.medium === "audio"
+      ? "/images/speaker.png"
+      : `${imgproxyurl}${recordUrl}
     `;
 </script>
 

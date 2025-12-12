@@ -39,19 +39,15 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
     const offset = (page - 1) * per_page;
 
     const { rows: results } = await db.query(
-      `SELECT id, title, detail, caption, file_mime, file_id, image_transform, 
-              count(*) OVER()::int AS full_count,
-              (ts_rank(ts, to_tsquery('english', $1)) * 0.7 + 
-               similarity(COALESCE(title, '') || ' ' || COALESCE(detail, '') || ' ' || COALESCE(caption, ''), $2) * 0.3) AS combined_rank
-       FROM records
-       WHERE (ts @@ to_tsquery('english', $1) OR 
-              similarity(COALESCE(title, '') || ' ' || COALESCE(detail, '') || ' ' || COALESCE(caption, ''), $2) > 0.2)
-             AND public = true
-       ORDER BY combined_rank DESC
-       OFFSET $3
-       LIMIT $4
+      `SELECT id, title, detail, caption_front, mime_type as file_mime, sha1_hash, transform, 
+      count(*) OVER()::int AS full_count, ts_rank(ts, to_tsquery('english', $1)) as rank
+       FROM files
+       WHERE ts @@ to_tsquery('english', $1) 
+       ORDER BY rank DESC
+       OFFSET $2
+       LIMIT $3
       `,
-      [parsed, q, offset, per_page],
+      [parsed, offset, per_page],
     );
 
     const total_count = results[0]?.full_count || 0;

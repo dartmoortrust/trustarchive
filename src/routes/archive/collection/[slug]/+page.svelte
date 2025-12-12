@@ -3,22 +3,20 @@
   import RecordGrid from "$lib/ui/RecordGrid.svelte";
   import Seo from "$lib/ui/SEO.svelte";
   import Icon from "@iconify/svelte";
-  import Container from "$lib/ui/Container.svelte";
   import Pagination from "$lib/ui/Pagination.svelte";
   import { goto } from "$app/navigation";
   let { data } = $props();
 </script>
 
 <Seo
-  title={`The ${data.collection.name} Collection from the Dartmoor Trust Archive`}
-  description={`The ${data.collection.name} Collection from the Dartmoor Trust Archive`}
-  image={`https://dartmoorweb.s3.eu-west-1.amazonaws.com/w-${data.records[0]?.file_id}`}
+  title={`The ${data.collection.title} Collection from the Dartmoor Trust Archive`}
+  description={`The ${data.collection.title} Collection from the Dartmoor Trust Archive`}
 />
 <div
   class="container flex flex-col mx-auto md:grid grid-cols-6 p-5 md:px-0 gap-5"
 >
   <div class="flex flex-col md:col-span-2 gap-5">
-    <Heading text={data.collection.name + " Collection"} />
+    <Heading text={data.collection.title + " Collection"} />
     <div class="flex-rows gap-4 text-gray-800 space-y-3">
       {#if data.collection.description}
         <div class="flex flex-col gap-3">
