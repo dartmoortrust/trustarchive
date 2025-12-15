@@ -2,7 +2,7 @@
 import { randomUUID } from "crypto";
 import bcrypt from "bcrypt";
 import { db } from "./db";
-import { sendEmail } from "./notify";
+import { sendEmail } from "./email";
 
 export class Auth {
   static async setPassword(key: string, password: string) {

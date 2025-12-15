@@ -50,7 +50,7 @@
       <span class="ellipsis">...</span>
     {:else}
       <button
-        class={`hover:cursor-pointer  p-1 border-gray-400 border-1 ${page === currentPage ? "bg-trust-b text-white" : "bg-white"}`}
+        class={`hover:cursor-pointer  px-2 bg-gray-400 border-gray-400 border-1 ${page === currentPage ? "bg-trust-b text-white" : "bg-white"}`}
         onclick={() => gotoPage(page)}
       >
         {page}

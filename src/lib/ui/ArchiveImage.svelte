@@ -12,7 +12,9 @@
 
   let isOpen = $state(false);
   const imgproxyurl = `https://boxes.dartmoortrust.org/insecure/rs:${crop ? "fill" : "fit"}:${size}:${size}/plain/`;
-  const recordUrl = `https://dartmoor.blob.core.windows.net/public/${record?.sha1_hash.slice(0, 2)}/w-${record?.sha1_hash}`;
+  const recordUrl = encodeURIComponent(
+    `https://dartmoor.blob.core.windows.net/public/${record?.sha1_hash.slice(0, 2)}/w-${record?.sha1_hash}`,
+  );
 
   const src =
     record.medium === "audio"
@@ -56,7 +58,7 @@
       class="relative flex items-center justify-center max-w-full max-h-full p-4"
     >
       <img
-        src={src.replace(`rs:fill:${size}:${size}`, "rs:fill:1500:1500")}
+        src={src.replace(`rs:fit:${size}:${size}`, "rs:fill:1500:1500")}
         alt=""
         class="max-w-full max-h-[90vh] rounded-lg"
       />
