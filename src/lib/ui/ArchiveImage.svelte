@@ -11,7 +11,7 @@
   } = $props();
 
   let isOpen = $state(false);
-  const imgproxyurl = `https://boxes.dartmoortrust.org/insecure/rs:fill:${size}:${size}/plain/`;
+  const imgproxyurl = `https://boxes.dartmoortrust.org/insecure/rs:${crop ? "fill" : "fit"}:${size}:${size}/plain/`;
   const recordUrl = `https://dartmoor.blob.core.windows.net/public/${record?.sha1_hash.slice(0, 2)}/w-${record?.sha1_hash}`;
 
   const src =

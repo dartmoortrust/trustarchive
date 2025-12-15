@@ -1,21 +1,6 @@
 <script lang="ts">
-  import Icon from "@iconify/svelte";
   import AuthButton from "./AuthButton.svelte";
-
-  const socialLinks = [
-    {
-      href: "https://www.facebook.com/thedartmoortrust",
-      icon: "tabler:brand-facebook",
-    },
-    {
-      href: "https://www.instagram.com/dartmoortrustarchive/?hl=en",
-      icon: "tabler:brand-instagram",
-    },
-    {
-      href: "https://twitter.com/dartmoorarchive",
-      icon: "tabler:brand-twitter",
-    },
-  ];
+  import { FacebookLogo, InstagramLogo, XLogo } from "phosphor-svelte";
 </script>
 
 <footer class="bg-white text-gray-900">
@@ -32,14 +17,15 @@
       <span>Charity Number: 1056362</span>
     </div>
     <div class="flex items-center gap-3 mx-auto">
-      {#each socialLinks as { href, icon }, i}
-        <a {href} target="_blank" rel="noopener noreferrer">
-          <Icon
-            {icon}
-            class="text-3xl text-slate-900 hover:text-slate-700 transition-all"
-          />
-        </a>
-      {/each}
+      <a href="https://www.facebook.com/thedartmoortrust">
+        <FacebookLogo weight="regular" size={32} />
+      </a>
+      <a href="https://www.instagram.com/dartmoortrustarchive/?hl=en">
+        <InstagramLogo weight="regular" size={32} />
+      </a>
+      <a href="https://twitter.com/dartmoorarchive">
+        <XLogo weight="regular" size={32} />
+      </a>
       <AuthButton />
     </div>
   </div>
