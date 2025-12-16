@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "./layout.css";
   import "../app.css";
   import { page } from "$app/stores";
   import { goto } from "$app/navigation";
@@ -17,14 +18,9 @@
     async
   ></script>
 </svelte:head>
-
-<div class="flex flex-col min-h-screen">
+<div class="flex min-h-screen flex-col">
   <Toaster position="top-center" />
   <Navbar />
-
-  <main class="flex-1 text-gray-800 bg-[#f7f7f7]">
-    {@render children()}
-  </main>
-
+  <main class="flex-1 bg-[#f7f7f7] text-gray-800">{@render children()}</main>
   <Footer />
 </div>
