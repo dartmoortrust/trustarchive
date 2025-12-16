@@ -2,16 +2,14 @@
   import Heading from "$lib/ui/Heading.svelte";
   import RecordGrid from "$lib/ui/RecordGrid.svelte";
   import type { PageData } from "./$types";
-  import { enhance } from "$app/forms";
   import Seo from "$lib/ui/SEO.svelte";
   import Icon from "@iconify/svelte";
-  import Button from "$lib/ui/Button.svelte";
   let { data }: { data: PageData } = $props();
 </script>
 
 <Seo
-  title={`Search results for ${data.pagination.q} from the Dartmoor Trust Archive`}
-  description={`Search results for ${data.pagination.q} from the Dartmoor Trust Archive`}
+  title={`Search results from the Dartmoor Trust Archive`}
+  description={`Search results from the Dartmoor Trust Archive`}
   image={`https://dartmoorweb.s3.eu-west-1.amazonaws.com/w-${data.results[0]?.file_id || ""}`}
 />
 <div class="container mx-auto grid py-5 md:grid-cols-6 md:gap-5">
