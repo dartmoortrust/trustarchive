@@ -13,7 +13,6 @@ export const load: PageServerLoad = async ({ params }) => {
 		LIMIT 1
 	`;
   const data = await db.query(sql, [params.id]);
-  console.log(data.rows[0]);
   return {
     record: data.rows[0],
   };

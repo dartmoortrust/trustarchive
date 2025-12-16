@@ -3,9 +3,6 @@
   import type { PageData } from "./$types";
   import SearchForm from "$lib/ui/SearchForm.svelte";
   import Seo from "$lib/ui/SEO.svelte";
-  import Carousel from "svelte-carousel";
-  import { browser } from "$app/environment";
-  import ArchiveImage from "$lib/ui/ArchiveImage.svelte";
   import Flex from "$lib/ui/Flex.svelte";
 
   let { data }: { data: PageData } = $props();
@@ -17,7 +14,7 @@
 </script>
 
 <Seo title="The Dartmoor Trust Archive" {description} image={seoImage} />
-<div class="container mx-auto grid md:grid-cols-2 md:px-0 p-5 gap-5">
+<div class="container mx-auto grid gap-5 p-5 md:grid-cols-2 md:px-0">
   <Flex>
     <Heading text="Dartmoor Trust Archive" />
     <Heading text="About our project" level={2} />
@@ -65,7 +62,7 @@
       <div class="flex flex-wrap gap-1">
         {#each data.collections as { slug, name }}
           <a
-            class="bg-gray-50 px-2 py-1 hover:bg-gray-200 transition"
+            class="bg-gray-50 px-2 py-1 transition hover:bg-gray-200"
             href={`/archive/collection/${slug}`}
             data-sveltekit-preload-data="false"
           >

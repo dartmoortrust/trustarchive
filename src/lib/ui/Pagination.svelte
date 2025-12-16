@@ -30,7 +30,7 @@
     return pages;
   }
 
-  function gotoPage(page) {
+  function gotoPage(page: any) {
     if (page !== "..." && page !== currentPage) {
       onPageChange(page);
     }
@@ -39,7 +39,7 @@
 
 <nav class="flex gap-2">
   <button
-    class="hover:cursor-pointer p-1 border-gray-400 border-1"
+    class="border-1 border-gray-400 p-1 hover:cursor-pointer"
     disabled={currentPage === 1}
     onclick={() => gotoPage(currentPage - 1)}
     ><Icon icon="solar:alt-arrow-left-linear" /></button
@@ -50,7 +50,7 @@
       <span class="ellipsis">...</span>
     {:else}
       <button
-        class={`hover:cursor-pointer  px-2 bg-gray-400 border-gray-400 border-1 ${page === currentPage ? "bg-trust-b text-white" : "bg-white"}`}
+        class={`border-1  border-gray-400 bg-gray-400 px-2 hover:cursor-pointer ${page === currentPage ? "bg-trust-b text-white" : "bg-white"}`}
         onclick={() => gotoPage(page)}
       >
         {page}
@@ -60,7 +60,7 @@
 
   <button
     disabled={currentPage === totalPages}
-    class="hover:cursor-pointer p-1 border-gray-400 border-1"
+    class="border-1 border-gray-400 p-1 hover:cursor-pointer"
     onclick={() => gotoPage(currentPage + 1)}
     ><Icon icon="solar:alt-arrow-right-linear" /></button
   >

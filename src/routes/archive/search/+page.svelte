@@ -14,7 +14,7 @@
   description={`Search results for ${data.pagination.q} from the Dartmoor Trust Archive`}
   image={`https://dartmoorweb.s3.eu-west-1.amazonaws.com/w-${data.results[0]?.file_id || ""}`}
 />
-<div class="container mx-auto py-5 grid md:grid-cols-6 md:gap-5">
+<div class="container mx-auto grid py-5 md:grid-cols-6 md:gap-5">
   <!-- Sidebar with search and pagination -->
   <div class="space-y-5 md:col-span-2">
     <Heading text="Search the Archive" />
@@ -40,13 +40,13 @@
       </div>
 
       {#if data.pagination.page_count > 1}
-        <div class="hidden md:flex gap-2 md:flex-wrap">
+        <div class="hidden gap-2 md:flex md:flex-wrap">
           {#each Array.from( { length: data.pagination.page_count }, ) as _, pageIndex}
             <a
               href={`/archive/search?q=${data.pagination.q}&page=${pageIndex + 1}&per_page=${data.pagination.per_page}`}
-              class="bg-gray-100 px-2 py-1 text-center
+              class="bg-gray-200 px-2 py-1 text-center
                   {pageIndex + 1 === data.pagination.page
-                ? 'bg-trust-b text-white shadow-lg'
+                ? 'bg-gray-800 text-white shadow-lg'
                 : 'hover:bg-gray-300'}"
             >
               {pageIndex + 1}
@@ -74,14 +74,14 @@
         <option value={50}>50 results per page</option>
         <option value={100}>100 results per page</option>
       </select>
-      <button class="p-2 bg-green-800 text-white" type="submit">Search</button>
+      <button class="bg-green-800 p-2 text-white" type="submit">Search</button>
     </form>
   </div>
 
   <!-- Search results -->
   <div class="col-span-4 space-y-5">
     {#if data.results?.length > 0}
-      <div class="p-2 border-1 border-slate-300">
+      <div class="border-1 border-slate-300 p-2">
         Results are shown with the most relevant records appearing first.
       </div>
 
