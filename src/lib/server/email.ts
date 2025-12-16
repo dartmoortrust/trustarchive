@@ -1,7 +1,6 @@
 import { env } from "$env/dynamic/private";
 import { EmailClient } from "@azure/communication-email";
-const connectionString = env.AZURE_EMAIL;
-const client = new EmailClient(connectionString);
+const client = new EmailClient(env.AZURE_EMAIL);
 
 export const sendEmail = async (email: string, body: string) => {
   console.log("sending email");

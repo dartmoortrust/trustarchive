@@ -5,28 +5,28 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   console.log("Loading Record Edit: ", params.id);
 
   const sql = `
-		SELECT r.title, r.original_id, r.id, r.file_id, r.detail, ST_asGeoJSON(r.location_geom)::json as geojson, r.caption, r.caption_rear,
-		r.date_year, r.date_month, r.date_day, f.mime_type as file_mime,  ARRAY_TO_STRING(f.file_paths, ',') as file_path, c.name as col_name, r.collection_id, 
-    r.medium_id, r.image_transform::json
-		from records r 
-		JOIN collections c on r.collection_id = c.id
-    JOIN files f on r.file_id = f.id
+		SELECT 
+      r.title, r.original_id, r.id, r.sha1_hash, r.detail, ST_asGeoJSON(r.location_geom)::json as geojson, 
+      r.caption_front, r.caption_back,
+		  r.date_year, r.date_month, r.date_day, r.date_estimated, 
+      c.title as col_name, r.collection_id, 
+      r.transform::json
+		from files r 
+		JOIN fonds c on r.collection_id = c.id
 		where r.id = $1
 		LIMIT 1
 	`;
   const data = await db.query(sql, [params.id]);
-  const collections = await db.query("select id, name from collections", []);
-  const media = await db.query("select * from media", []);
-  const past_edits = await db.query(
-    "select id, updated_at, title from records where updated_by = $1 order by updated_at DESC",
-    [locals?.session.email],
-  );
-  console.log(past_edits);
+  const collections = await db.query("select id, title as name from fonds", []);
+  // const media = await db.query("select * from media", []);
+  // const past_edits = await db.query(
+  //   "select id, updated_at, title from records where updated_by = $1 order by updated_at DESC",
+  //   [locals?.session.email],
+  // );
   return {
     record: data.rows[0],
     collections: collections.rows,
-    media: media.rows,
-    user_edits: past_edits.rows,
+    media: [],
   };
 };
 
@@ -45,60 +45,54 @@ export const actions = {
             : value,
         ]),
       );
+      console.log(values);
       const {
-        record_id,
-        title,
-        detail,
-        caption,
-        caption_rear,
-        date_day,
-        date_month,
-        date_year,
-        collection_id,
-        original_id,
-        medium_id,
-        geojson,
-        image_transform,
+        record_id, //1
+        title, //2
+        detail, //3
+        caption, //4
+        caption_back, //5
+        date_day, //6
+        date_month, //7
+        date_year, //8
+        collection_id, //9
+        original_id, //10
+        // medium_id,
+        geojson, //11
       } = values;
       // Perform the database update
-      const UPDATE_RECORD_SQL = `UPDATE records
+      const UPDATE_RECORD_SQL = `UPDATE files
          SET title = $2,
-          caption = $3,
           detail = $4,
+          caption_front = $3,
           date_day = $5,
           date_month = $6,
           date_year = $7,
           collection_id = $8,
           original_id = $9,
-          medium_id = $10,
-          location_geom = ST_GeomFromGeoJSON($11),
-          image_transform = $12,
-          updated_by = $13,
-          caption_rear = $14
+          location_geom = ST_GeomFromGeoJSON($10),
+          caption_back = $11
           WHERE id = $1`;
       const UPDATE_RECORD_VALUES = [
-        parseInt(record_id),
-        title,
-        caption,
-        detail,
-        date_day,
-        date_month,
-        date_year,
-        parseInt(collection_id),
-        original_id,
-        medium_id,
-        JSON.parse(geojson),
-        JSON.parse(image_transform),
-        locals.session.email,
-        caption_rear,
+        record_id, //1
+        title, //2
+        caption, //3
+        detail, //4
+        date_day, //5
+        date_month, //6
+        date_year, //7
+        collection_id, //8
+        original_id, //9
+        JSON.parse(geojson), //10
+        caption_back, //11
       ];
       await db.query("BEGIN");
       await db.query(UPDATE_RECORD_SQL, UPDATE_RECORD_VALUES);
-      const UPDATE_EDIT_LOG_SQL = `
-        INSERT INTO record_edits (record_id, user_id) VALUES ($1, $2)
-      `;
-      const UPDATE_EDIT_LOG_VALUES = [values.record_id, locals.session.id];
-      await db.query(UPDATE_EDIT_LOG_SQL, UPDATE_EDIT_LOG_VALUES);
+      // const UPDATE_EDIT_LOG_SQL = `
+      //   INSERT INTO record_edits (record_id, user_id) VALUES ($1, $2)
+      // `;
+      // const UPDATE_EDIT_LOG_VALUES = [values.record_id, locals.session.id];
+      // await db.query(UPDATE_EDIT_LOG_SQL, UPDATE_EDIT_LOG_VALUES);
       await db.query("COMMIT");
       return { success: true };
     } catch (error) {
