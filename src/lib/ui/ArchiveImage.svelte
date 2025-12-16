@@ -24,9 +24,10 @@
 </script>
 
 {#if record.medium === "video"}
-  <Icon
-    icon="solar:videocamera-outline"
-    class="w-[200px] h-auto p-8 bg-white"
+  <img
+    src={`${imgproxyurl}${encodeURIComponent(`https://dartmoor.blob.core.windows.net/public/${record?.sha1_hash.slice(0, 2)}/s-${record?.sha1_hash}`)}`}
+    class={grow ? "w-full" : ""}
+    alt={record.title || "An image from the Dartmoor Trust Archive"}
   />
 {:else if record.medium === "audio"}
   <Icon

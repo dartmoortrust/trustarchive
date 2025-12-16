@@ -21,8 +21,9 @@ export const load: PageServerLoad = async ({ url, params }) => {
     `
     SELECT r.title, r.id,  r.detail, ST_asGeoJSON(r.location_geom)::json as geojson, 
            count(*) OVER()::int AS full_count, r.date_year, r.date_month, r.date_day, 
-           r.mime_type as file_mime, r.sha1_hash
+           r.mime_type as file_mime, r.sha1_hash, fm.medium
     FROM files r 
+    JOIN file_mimes fm ON fm.mime_type = r.mime_type
     WHERE r.collection_id = $1
       AND r.public = true
     ORDER BY  r.id
