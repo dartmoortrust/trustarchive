@@ -41,7 +41,6 @@
     "algoliasearch": "^5.46.0",
     "bcrypt": "^5.1.1",
     "bits-ui": "^2.14.4",
-    "file-type": "^21.1.1",
     "mt-latlon": "^0.1.2",
     "mt-osgridref": "^0.1.0",
     "node-fetch": "^3.3.2",

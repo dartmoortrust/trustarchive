@@ -1,12 +1,11 @@
 <script lang="ts">
   let { record } = $props();
-  // let src = `https://dartmoor.blob.core.windows.net/web/w-${record.file_id}`;
-  const src = `https://dartmoor.blob.core.windows.net/public/${record.file_id?.slice(0, 2)}/w-${record.file_id}`;
+  const src = `https://dartmoor.blob.core.windows.net/public/${record?.sha1_hash?.slice(0, 2)}/w-${record?.sha1_hash}`;
 </script>
 
 {#if record.file_mime.startsWith("video")}
   <video controls class="w-full max-h-[80vh] bg-black">
-    <source {src} type="video/mp4" />
+    <source {src} type="video/webm" />
     <track
       kind="captions"
       src=""
