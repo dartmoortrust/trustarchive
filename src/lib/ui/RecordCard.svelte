@@ -10,7 +10,7 @@
     class="relative shadow-lg block"
     data-sveltekit-preload-data="off"
   >
-    <ArchiveImage {record} size={200} crop={true} />
+    <ArchiveImage {record} size={200} crop={true} lightbox={false} />
 
     {#if record.title}
       <span
@@ -26,7 +26,7 @@
     class="relative shadow-lg block"
     data-sveltekit-preload-data="off"
   >
-    <ArchiveImage {record} size={200} crop={true} />
+    <ArchiveImage {record} size={200} crop={true} lightbox={false} />
 
     {#if record.title}
       <span
