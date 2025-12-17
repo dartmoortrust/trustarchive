@@ -1,8 +1,6 @@
 <script lang="ts">
   import "./layout.css";
   import "../app.css";
-  import { page } from "$app/stores";
-  import { goto } from "$app/navigation";
   import Navbar from "$lib/ui/Navbar.svelte";
   import { Toaster } from "svelte-sonner";
   import Footer from "$lib/ui/Footer.svelte";
@@ -21,6 +19,10 @@
 <div class="flex min-h-screen flex-col">
   <Toaster position="top-center" />
   <Navbar />
-  <main class="flex-1 bg-[#f7f7f7] text-gray-800">{@render children()}</main>
+  <main class="flex-1 bg-[#f7f7f7] text-gray-800">
+    <svelte:boundary onerror={(e) => console.log(e)}>
+      {@render children()}
+    </svelte:boundary>
+  </main>
   <Footer />
 </div>

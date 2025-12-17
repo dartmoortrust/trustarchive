@@ -1,11 +1,8 @@
 <script lang="ts">
-  let { children, verticalpad = 10 } = $props();
+  let { children, py = false } = $props();
+  let css = $derived(`container mx-auto ${py && "py-10"}`);
 </script>
 
-<div
-  class="container md:mx-auto"
-  style:padding-top="{verticalpad * 0.25}rem"
-  style:padding-bottom="{verticalpad * 0.25}rem"
->
+<div class={css}>
   {@render children?.()}
 </div>

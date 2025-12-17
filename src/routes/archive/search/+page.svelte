@@ -10,9 +10,8 @@
 <Seo
   title={`Search results from the Dartmoor Trust Archive`}
   description={`Search results from the Dartmoor Trust Archive`}
-  image={`https://dartmoorweb.s3.eu-west-1.amazonaws.com/w-${data.results[0]?.file_id || ""}`}
 />
-<div class="container mx-auto grid py-5 md:grid-cols-6 md:gap-5">
+<div class="container mx-auto grid py-5 md:grid-cols-6 md:gap-10">
   <!-- Sidebar with search and pagination -->
   <div class="space-y-5 md:col-span-2">
     <Heading text="Search the Archive" />

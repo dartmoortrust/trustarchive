@@ -4,44 +4,11 @@
   import Hero from "$lib/ui/Hero.svelte";
   import Image from "$lib/ui/Image.svelte";
   import Seo from "$lib/ui/SEO.svelte";
-  import type { PageData } from "./$types";
-
-  const phoebevents = [
-    // {
-    //   title: "Light in the West",
-    //   location: "The RWS Gallery, Whitcomb Street, London, WC2 7HA",
-    //   description:
-    //     "Celebrating the 25th anniversary of the Academy and the legacy of art in the region. Including paintings from the Newlyn and St Ives schools. See further details at www.southwestacademy.org",
-    //   image: "3.png",
-    //   date: "July 18th - July 25th 2025. Daily from 11am to 5pm.",
-    // },
-    // {
-    //   title: "Dartmoor - New Horizons",
-    //   location: "Neadon Barn, Manageton, Devon, TQ13 9UY.",
-    //   date: "September 6th - 14th. Daily from 10:30am to 4:30pm.",
-    //   description:
-    //     "A major exhibition of dartmoor paintings. For more information and map to the location please visit www.devonopenstudios.co.uk",
-    // },
-  ];
-
-  const events = [
-    {
-      title: "Dartmoor in the 1920's",
-      location: "Dartmoor National Park Visitor Centre, Princetown, Devon",
-      description:
-        "A free exhibition about life and tourism on Dartmoor. Come and see us at the Dartmoor National Park visitor centre in Princetown.",
-      date: "June 17th - July 27th 2025. Daily from 10am to 5pm.",
-      image: "1920s.jpg",
-    },
-  ];
-
-  let { data }: { data: PageData } = $props();
 </script>
 
 <Seo
   title="Home"
   description="The Dartmoor Trust exists to support life in this beautiful and special part of the World. Our people, environment and heritage. We pride ourselves in having supported hundreds of community groups to bring their projects to life and we welcome you to join us in our work. Your donations and legacies help the Dartmoor Trust to continue to provide funding to allow for this important work to continue."
-  image="/images/banner1.jpg"
 />
 <div class="">
   <Hero bgimage="/images/banner2.jpg">
@@ -52,27 +19,30 @@
 </div>
 <div class="grid md:grid-cols-1 gap-5 container md:mx-auto md:px-0 px-5 py-5">
   <div
-    class="gap-10 bg-white p-10 rounded-xl text-slate-800 gap-10 flex flex-col "
+    class="gap-10 bg-white p-10 rounded-xl text-slate-800 gap-10 flex flex-col"
   >
-    <Heading
-      text="Can you identify this Dartmoor cottage?"
-      level={2}
-    />
-    <img src="/images/cottage.webp" alt="Mystery Cottage" class="rounded-xl"/>
-    
-      <p>
-        We were recently given this photograph of a cottage on Dartmoor but it comes with a mystery - we don't know where it is! If you can help us identify the location please get in touch via our contact page.
-      </p>
-      <p>The only clues we have are:</p>
-      <ul class="list-disc list-inside">
-        <li>Possibly dated in the 1940s.</li>
-        <li>Letters 'S' and 'O' are scratched onto the back of the painting.</li>
-        <li>The frame had the full name ' Marcelle Geloso ' on the back.</li>
-        <li>There are no other buildings visible nearby</li>
-        </ul>
-        <p>Please email us if you know any more about this <a href="mailto:secretary@dartmoortrust.org">secretary@dartmoortrust.org</a> </p>
-    </div>
+    <Heading text="Can you identify this Dartmoor cottage?" level={2} />
+    <img src="/images/cottage.webp" alt="Mystery Cottage" class="rounded-xl" />
+
+    <p>
+      We were recently given this photograph of a cottage on Dartmoor but it
+      comes with a mystery - we don't know where it is! If you can help us
+      identify the location please get in touch via our contact page.
+    </p>
+    <p>The only clues we have are:</p>
+    <ul class="list-disc list-inside">
+      <li>Possibly dated in the 1940s.</li>
+      <li>Letters 'S' and 'O' are scratched onto the back of the painting.</li>
+      <li>The frame had the full name ' Marcelle Geloso ' on the back.</li>
+      <li>There are no other buildings visible nearby</li>
+    </ul>
+    <p>
+      Please email us if you know any more about this <a
+        href="mailto:secretary@dartmoortrust.org">secretary@dartmoortrust.org</a
+      >
+    </p>
   </div>
+</div>
 <div class="grid md:grid-cols-2 gap-5 container md:mx-auto md:px-0 px-5 py-5">
   <div
     class="col-span-2 grid grid-cols-3 gap-10 bg-white p-10 rounded-xl text-slate-800"
@@ -98,21 +68,6 @@
           provide new interpretations of the moor through paintings and other
           works of art.
         </p>
-        {#each data.events as event}
-          {#if event.tag === "phoebe"}
-            <div class="border-l-2 pl-5 text-slate-800">
-              <Flex>
-                <Heading text={event.title} level={3} />
-                <p class="text-sm">{event.subtitle}</p>
-                <p class="text-sm">{event.location}</p>
-                <p class="">{event.tease}</p>
-                <a href={`/event/${event.id}`} class="text-blue-500"
-                  >More Information</a
-                >
-              </Flex>
-            </div>
-          {/if}
-        {/each}
       </div>
     </div>
     <Image
@@ -123,38 +78,7 @@
     />
   </div>
 </div>
-<!-- <div
-  class="gap-5 container mx-auto space-y-10 bg-white p-10 rounded-xl text-slate-80"
->
-  <Heading text="Events" level={2} />
-  {#each data.events as event}
-    {#if event.tag !== "phoebe"}
-      <div class="border-l-2 pl-5 text-slate-800">
-        <Flex>
-          <Heading text={event.title} level={3} />
-          <p class="text-sm">{event.subtitle}</p>
-          <p class="text-sm">{event.location}</p>
-          <p class="">{event.tease}</p>
-          <a href={`/event/${event.id}`} class="text-blue-500"
-            >More Information</a
-          >
-        </Flex>
-      </div>
-    {/if}
-  {/each}
-</div> -->
 <div class="grid md:grid-cols-2 gap-5 container md:mx-auto md:px-0 px-5 py-5">
-  <!-- <div class="p-5 bg-white rounded-xl text-slate-800">
-    <Flex>
-      <Heading text="Dartmoor Trust Archive" level={2} />
-      <p class="">
-        Tens of thousands of photographs, videos and audio recordings that
-        record the history of Dartmoor and it's people.
-      </p>
-      <Button href="/archive" text="Explore the Archive" />
-      <Image alt="Dartmoor Trust Archive" imagesrc="archive.jpeg" crop />
-    </Flex>
-  </div> -->
   <div class="block md:col-span-2 rounded-xl bg-white md:flex">
     <blockquote
       class="space-y-5 p-5 text-xl font-semibold italic text-gray-900"

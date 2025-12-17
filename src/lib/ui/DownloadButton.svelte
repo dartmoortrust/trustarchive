@@ -7,10 +7,10 @@
 {#if page.data.session?.roles?.includes("file-download") || record.downloadable}
   <a
     href={`/archive/record/${record.id}/download`}
-    class="flex gap-3 bg-green-400 p-3 text-gray-800 shadow-md hover:shadow-xl
-    transition-all"
+    class="flex items-center gap-2 bg-green-400 p-2 text-gray-800 shadow-md transition-all
+    hover:shadow-xl"
   >
-    <Icon icon="solar:cloud-download-broken" width="24" height="24" />
+    <Icon icon="solar:cloud-download-broken" width="20" height="20" />
     Download Full Version
   </a>
 {/if}

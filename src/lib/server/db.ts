@@ -8,13 +8,14 @@ const { Pool } = pkg;
  */
 export const db = new Pool({
   connectionString: env.DB_URL,
-  max: 20,
-  idleTimeoutMillis: 30000,
+  max: 10,
+  idleTimeoutMillis: 5000,
   connectionTimeoutMillis: 2000,
   ssl: {
     rejectUnauthorized: false,
   },
 });
+
 
 export const getFile = async (file_id: string) => {
   try {

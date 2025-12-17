@@ -1,8 +1,9 @@
 <script lang="ts">
-    let { alt, imagesrc, width=300, height=null, crop=false, grow=false } = $props();
-    const imgproxyurl = "/api/image";
-    //const s3url = "https://dartmoorpublic.lon1.cdn.digitaloceanspaces.com/w-";
-    const src = `${imgproxyurl}?url=${imagesrc}&width=${width}&height=${height}&crop=${crop}`;
+  let { alt, imagesrc, size = 300, crop = false, grow = false } = $props();
+
+  const src = $derived(
+    `https://boxes.dartmoortrust.org/insecure/rs:${crop ? "fill" : "fit"}:${size}:${size}/plain/${encodeURIComponent(imagesrc)}`,
+  );
 </script>
 
-<img {src} {alt} class={`${grow ? "w-full" : ""}`} />
+<img {src} {alt} class={grow ? "w-full" : ""} />

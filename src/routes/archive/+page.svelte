@@ -1,20 +1,17 @@
 <script lang="ts">
   import Heading from "$lib/ui/Heading.svelte";
-  import type { PageData } from "./$types";
   import SearchForm from "$lib/ui/SearchForm.svelte";
   import Seo from "$lib/ui/SEO.svelte";
   import Flex from "$lib/ui/Flex.svelte";
-
-  let { data }: { data: PageData } = $props();
+  import { getCollections } from "../data.remote";
 
   // Centralize commonly used data
   const contactEmail = "secretary@dartmoortrust.org";
   const description = `Tens of thousands of images, video and audio from Dartmoor's past`;
-  const seoImage = `https://dartmoor.ac1n45ddogi6i.eu-west-1.cs.amazonlightsail.com/unsafe/rs:fit:500:/g:no/plain/https://dartmoorweb.s3.eu-west-1.amazonaws.com/w-d61c5bad8e99bb013682c0ac3673056ead9e5c17`;
 </script>
 
-<Seo title="The Dartmoor Trust Archive" {description} image={seoImage} />
-<div class="container mx-auto grid gap-5 p-5 md:grid-cols-2 md:px-0">
+<Seo title="The Dartmoor Trust Archive" {description} />
+<div class="container mx-auto grid gap-10 p-5 md:grid-cols-2 md:px-0">
   <Flex>
     <Heading text="Dartmoor Trust Archive" />
     <Heading text="About our project" level={2} />
@@ -57,19 +54,17 @@
       >.
     </p>
 
-    {#if data.collections.length > 0}
-      <Heading text="Our Collections" level={2} />
-      <div class="flex flex-wrap gap-1">
-        {#each data.collections as { slug, name }}
-          <a
-            class="bg-gray-50 px-2 py-1 transition hover:bg-gray-200"
-            href={`/archive/collection/${slug}`}
-            data-sveltekit-preload-data="false"
-          >
-            {name}
-          </a>
-        {/each}
-      </div>
-    {/if}
+    <Heading text="Our Collections" level={2} />
+    <div class="flex flex-wrap gap-1">
+      {#each await getCollections() as { name, slug }}
+        <a
+          class="bg-gray-50 px-2 py-1 transition hover:bg-gray-200"
+          href={`/archive/collection/${slug}`}
+          data-sveltekit-preload-data="false"
+        >
+          {name}
+        </a>
+      {/each}
+    </div>
   </Flex>
 </div>

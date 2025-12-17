@@ -1,6 +1,8 @@
 <script lang="ts">
   let { record } = $props();
-  const src = `https://dartmoor.blob.core.windows.net/public/${record.file_id?.slice(0, 2)}/w-${record.file_id}`;
+  const src = $derived(
+    `https://dartmoor.blob.core.windows.net/public/${record.file_id?.slice(0, 2)}/w-${record.file_id}`,
+  );
 </script>
 
 <video

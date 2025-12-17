@@ -1,5 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap");
-:root {
+root {
   --color-trust-a: #fffcf6;
   --color-trust-b: #84a98c;
   --color-trust-c: #52796f;
@@ -11,23 +11,4 @@
 body {
   font-family: "Lato", sans-serif;
   font-optical-sizing: auto;
-}
-a.link:link {
-  color: #0000ee; /* Standard blue for unvisited links */
-  text-decoration: underline;
-}
-
-a.link:visited {
-  color: #551a8b; /* Standard purple for visited links */
-  text-decoration: underline;
-}
-
-a.link:hover {
-  color: #ee0000; /* Red on hover */
-  text-decoration: none; /* Remove underline on hover */
-}
-
-a.link:active {
-  color: #ff0000; /* Bright red when active */
-  text-decoration: underline;
 }

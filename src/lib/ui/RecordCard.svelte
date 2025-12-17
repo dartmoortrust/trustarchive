@@ -8,6 +8,7 @@
     href={`/archive/record/${record.id}`}
     aria-label="Link to archive record"
     class="relative shadow-lg block"
+    data-sveltekit-preload-data="off"
   >
     <ArchiveImage {record} size={200} crop={true} />
 
@@ -23,6 +24,7 @@
     href={`/archive/record/${record.id}`}
     aria-label="Link to archive record"
     class="relative shadow-lg block"
+    data-sveltekit-preload-data="off"
   >
     <ArchiveImage {record} size={200} crop={true} />
 

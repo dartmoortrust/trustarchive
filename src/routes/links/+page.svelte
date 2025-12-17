@@ -1,7 +1,6 @@
 <script lang="ts">
   import Container from "$lib/ui/Container.svelte";
   import Flex from "$lib/ui/Flex.svelte";
-  import Grid from "$lib/ui/Grid.svelte";
   import Heading from "$lib/ui/Heading.svelte";
 
   const urls = [
@@ -109,7 +108,7 @@
   });
 </script>
 
-<div class="container mx-auto py-5 px-5 md:px-0">
+<Container py>
   <Flex>
     <Heading text="Links" />
     <Flex space={1}>
@@ -118,4 +117,4 @@
       {/each}
     </Flex>
   </Flex>
-</div>
+</Container>

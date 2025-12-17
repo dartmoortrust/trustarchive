@@ -2,74 +2,76 @@
   import ArchiveImage from "$lib/ui/ArchiveImage.svelte";
   import Heading from "$lib/ui/Heading.svelte";
   import Map from "$lib/ui/Map.svelte";
-  import type { PageData } from "./$types";
   import Seo from "$lib/ui/SEO.svelte";
   import DownloadButton from "$lib/ui/DownloadButton.svelte";
   import EditButton from "$lib/ui/EditButton.svelte";
-  import RecordInfo from "$lib/ui/RecordInfo.svelte";
   import Grid from "$lib/ui/Grid.svelte";
   import Flex from "$lib/ui/Flex.svelte";
   import AudioPlayer from "$lib/ui/AudioPlayer.svelte";
   import MobileHidden from "$lib/ui/MobileHidden.svelte";
   import VideoPlayer from "$lib/ui/VideoPlayer.svelte";
-  let { data }: { data: PageData } = $props();
-  console.log(data.record);
+  import Container from "$lib/ui/Container.svelte";
+  import { Archive, Clock, Info } from "phosphor-svelte";
+  import Markdown from "$lib/ui/Markdown.svelte";
+  import Link from "$lib/ui/Link.svelte";
+  import { getRecord } from "../../../data.remote";
+  let { params } = $props();
+  const record = $derived(await getRecord(params.id));
 </script>
 
-{#if data.record.public == false}
+{#if record.public == false}
   <div>This record is not public</div>
 {:else}
   <Seo
-    title={data.record?.title || "Dartmoor Trust Archive"}
-    description={data.record?.title || "Dartmoor Trust Archive"}
-    image={`https://dartmoor.blob.core.windows.net/public/w-${data.record?.file_id || ""}`}
+    title={record?.title || "Dartmoor Trust Archive"}
+    description={record?.title || "Dartmoor Trust Archive"}
   />
   <div class="md:hidden">
-    <ArchiveImage record={data.record} grow={true} />
+    <ArchiveImage {record} grow={true} />
   </div>
-  <div class="flex md:grid grid-cols-2 p-5 md:px-0 md:gap-5 container mx-auto">
+  <Container>
     <Flex>
-      <Heading text={data.record.title} />
-      <Grid cols={2} gap={6}>
-        <RecordInfo
-          label={data.record.colname + " Collection"}
-          icon={"solar:inbox-outline"}
-          href={`/archive/collection/${data.record.colslug}`}
-        />
-        <!-- <RecordInfo
-          label="Tell us more"
-          icon={"solar:lightbulb-minimalistic-linear"}
-          href={`/archive/record/${data.record.id}/feedback`}
-        /> -->
-        {#if data.record.date_day || data.record.date_month || data.record.date_year}
-          <RecordInfo
-            label={`${data.record.date_day || "?"}/${data.record.date_month || "?"}/${data.record.date_year || "?"}`}
-            icon={"solar:calendar-outline"}
-          />
-        {/if}
-        <DownloadButton record={data.record} />
-        <EditButton record={data.record} />
-        <!-- <FaveButton fave /> -->
+      <Heading text={record.title} />
+      <Grid cols={2}>
+        <Flex>
+          <div class="bg-white p-2 shadow">
+            <div class="flex items-center gap-2">
+              <Archive />Collection:
+              <Link
+                href={`/archive/collection/${record.colslug}`}
+                text={record.colname + " Collection"}
+              />
+            </div>
+            <div class="flex items-center gap-2">
+              <Clock />Date: {`${record.date_day || "?"}/${record.date_month || "?"}/${record.date_year || "?"}`}
+            </div>
+            <div class="flex items-center gap-2">
+              <Info />Caption (front): {record.caption_front || "?"}
+            </div>
+            <div class="flex items-center gap-2">
+              <Info />Caption (rear): {record.caption_rear || "?"}
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <DownloadButton {record} />
+            <EditButton {record} />
+          </div>
+
+          <Markdown md={record.detail || ""} />
+        </Flex>
+        <Flex>
+          {#if record.file_mime.startsWith("audio")}
+            <AudioPlayer {record} />
+          {:else if record.file_mime.startsWith("video")}
+            <VideoPlayer {record} />
+          {:else}
+            <MobileHidden>
+              <ArchiveImage {record} crop={false} />
+            </MobileHidden>
+          {/if}
+          <Map geojson={record.geojson} estimated={record.location_estimated} />
+        </Flex>
       </Grid>
-      <div class="text-lg space-y-3">
-        {data.record.detail ||
-          "We do not have any further information on this record - if you know something, please let us know. You can use the button above or email secretary@dartmoortrust.org"}
-      </div>
     </Flex>
-    <div>
-      {#if data.record.file_mime.startsWith("audio")}
-        <AudioPlayer record={data.record} />
-      {:else if data.record.file_mime.startsWith("video")}
-        <VideoPlayer record={data.record} />
-      {:else}
-        <MobileHidden>
-          <ArchiveImage record={data.record} crop={false} />
-        </MobileHidden>
-      {/if}
-      <Map
-        geojson={data.record.geojson}
-        estimated={data.record.location_estimated}
-      />
-    </div>
-  </div>
+  </Container>
 {/if}

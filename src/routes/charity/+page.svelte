@@ -1,10 +1,10 @@
 <script lang="ts">
   import Button from "$lib/ui/Button.svelte";
+  import Container from "$lib/ui/Container.svelte";
   import Heading from "$lib/ui/Heading.svelte";
   import Image from "$lib/ui/Image.svelte";
   import Seo from "$lib/ui/SEO.svelte";
-  import type { PageData } from "../$types";
-  let { data }: { data: PageData } = $props();
+  import { getTrustees } from "../data.remote";
   const partners = [
     "Aune Head",
     "Bellever YHA",
@@ -111,121 +111,127 @@
 <Seo
   title="Dartmoor Trust | Charity"
   description="The Dartmoor Trust is an exceptional charity committed to supporting the people and history of Dartmoor. Situated amidst the captivating landscapes of South West England, Dartmoor boasts not only breathtaking natural beauty but also a rich tapestry of history that spans thousands of years. The Dartmoor Trust recognizes the significance of preserving this heritage and actively works to promote its conservation, education, and community engagement."
-  image="https://dartmoorasset.s3.eu-west-1.amazonaws.com/charity/charity.jpg"
 />
 
-<div class="container mx-auto grid md:grid-cols-4 gap-5 py-5 px-5 md:px-0">
-  <div class="col-span-3 flex flex-col gap-5">
-    <Heading text="Our Charity" />
-    <Heading text="About the Dartmoor Trust" level={2} />
-    <p>
-      The Dartmoor Trust is an exceptional charity committed to supporting the
-      people and history of Dartmoor. Situated amidst the captivating landscapes
-      of South West England, Dartmoor boasts not only breathtaking natural
-      beauty but also a rich tapestry of history that spans thousands of years.
-      The Dartmoor Trust recognizes the significance of preserving this heritage
-      and actively works to promote its conservation, education, and community
-      engagement.
-    </p>
-    <p>
-      The Dartmoor Trust is deeply rooted in the local communities and endeavors
-      to foster a strong sense of pride and connection to Dartmoor's heritage.
-      Through a range of initiatives, including workshops, exhibitions, and
-      events, the Trust highlights the cultural traditions, folklore, and
-      historical importance of the region. By engaging with the local
-      population, the charity instills a deep appreciation for Dartmoor's
-      history and encourages active participation in its preservation.
-    </p>
-    <p>
-      Beyond community engagement, the Dartmoor Trust plays a crucial role in
-      safeguarding Dartmoor's physical and archaeological assets. Collaborating
-      closely with local authorities, conservation groups, and volunteers, the
-      Trust identifies and protects significant historical sites, monuments, and
-      landmarks. Through research, sustainable practices, and responsible
-      tourism advocacy, the Trust ensures that Dartmoor's heritage is conserved
-      for future generations to cherish, enabling visitors to experience the
-      region's rich history while preserving its integrity.
-    </p>
-    <Heading text="Our Trustees" level={2} />
-    <div class="grid gap-5 grid-cols-2 md:grid-cols-4">
-      {#each data?.trustees as trustee}
-        <a
-          href="/charity/trustee/{trustee.slug}"
-          class="shadow-md hover:shadow-lg transition bg-white rounded-xl"
-        >
-          <div class="rounded-t-xl overflow-hidden">
-            <Image
-              imagesrc={`https://dartmoor.blob.core.windows.net/assets/${trustee.image_url}`}
-              alt={trustee.name}
-              grow
-            />
-          </div>
+<Container py>
+  <div class="grid grid-cols-4 gap-5">
+    <div class="col-span-3 flex flex-col gap-5">
+      <Heading text="Our Charity" />
+      <Heading text="About the Dartmoor Trust" level={2} />
+      <p>
+        The Dartmoor Trust is an exceptional charity committed to supporting the
+        people and history of Dartmoor. Situated amidst the captivating
+        landscapes of South West England, Dartmoor boasts not only breathtaking
+        natural beauty but also a rich tapestry of history that spans thousands
+        of years. The Dartmoor Trust recognizes the significance of preserving
+        this heritage and actively works to promote its conservation, education,
+        and community engagement.
+      </p>
+      <p>
+        The Dartmoor Trust is deeply rooted in the local communities and
+        endeavors to foster a strong sense of pride and connection to Dartmoor's
+        heritage. Through a range of initiatives, including workshops,
+        exhibitions, and events, the Trust highlights the cultural traditions,
+        folklore, and historical importance of the region. By engaging with the
+        local population, the charity instills a deep appreciation for
+        Dartmoor's history and encourages active participation in its
+        preservation.
+      </p>
+      <p>
+        Beyond community engagement, the Dartmoor Trust plays a crucial role in
+        safeguarding Dartmoor's physical and archaeological assets.
+        Collaborating closely with local authorities, conservation groups, and
+        volunteers, the Trust identifies and protects significant historical
+        sites, monuments, and landmarks. Through research, sustainable
+        practices, and responsible tourism advocacy, the Trust ensures that
+        Dartmoor's heritage is conserved for future generations to cherish,
+        enabling visitors to experience the region's rich history while
+        preserving its integrity.
+      </p>
+      <Heading text="Our Trustees" level={2} />
+      <div class="grid gap-5 grid-cols-2 md:grid-cols-4">
+        {#each await getTrustees() as { slug, name, image_url }}
+          <a
+            href="/charity/trustee/{slug}"
+            class="shadow-md hover:shadow-lg transition bg-white rounded-xl"
+            data-sveltekit-preload-data="off"
+          >
+            <div class="rounded-t-xl overflow-hidden">
+              <Image
+                imagesrc={`https://dartmoor.blob.core.windows.net/assets/${image_url}`}
+                alt={name}
+                grow
+                size={200}
+              />
+            </div>
 
-          <span class="block p-5 font-light text-center">
-            {trustee.name}
-          </span>
-        </a>
-      {/each}
+            <span class="block p-5 font-light text-center">
+              {name}
+            </span>
+          </a>
+        {/each}
+      </div>
+
+      <Heading text="Support our Work" level={2} />
+      <p>
+        Donating to the Dartmoor Trust is an investment in the preservation of a
+        cherished heritage. Your contribution helps ensure that the rich
+        history, cultural traditions, and natural beauty of Dartmoor are
+        safeguarded for future generations to appreciate and enjoy. By
+        supporting our charity, you actively contribute to community engagement,
+        conservation efforts, and educational programs that promote a deep
+        connection to Dartmoor's people and their remarkable history.
+      </p>
+      <Heading text="Apply for Support" level={2} />
+
+      <p>
+        Applying for support from the Dartmoor Trust is a wonderful opportunity
+        for individuals, organizations, and projects that align with our mission
+        of preserving Dartmoor's people and history. Whether you are an aspiring
+        artist looking to promote Dartmoor's cultural heritage, a community
+        group seeking funding for a historical preservation project, or a
+        researcher aiming to uncover new insights into the region's past, the
+        Dartmoor Trust welcomes applications from all those who share a passion
+        for the preservation and celebration of Dartmoor's unique heritage. Our
+        application process is designed to be inclusive and accessible, ensuring
+        that deserving initiatives have the opportunity to receive the support
+        they need. By applying for support from the Dartmoor Trust, you join a
+        community of like-minded individuals and organizations committed to
+        making a positive impact on the preservation and appreciation of
+        Dartmoor's people and history.
+      </p>
+      <p>
+        Before you apply, be sure to read the <a
+          class="link"
+          href="/charity/terms-and-conditions"
+          >terms and conditions of application</a
+        >.
+      </p>
+      <Button
+        text="Download an Application Form"
+        href="https://dartmoor.blob.core.windows.net/assets/DartmoorTrustGrantApplication.doc"
+      />
+      <Heading text="Donations" level={2} />
+      <p class="">
+        We welcome donations to support our work. If you would like to make a
+        simple BACS transfer you may use the details below. Every penny goes
+        into supporting our projects and keeping the work to support Dartmoor
+        alive.
+      </p>
+      <p>
+        NATWEST BANK<br />
+        Sort Code: 54 21 14<br />
+        Account Name: Dartmoor Trust<br />
+        Account Number: 2444 0477
+      </p>
     </div>
-
-    <Heading text="Support our Work" level={2} />
-    <p>
-      Donating to the Dartmoor Trust is an investment in the preservation of a
-      cherished heritage. Your contribution helps ensure that the rich history,
-      cultural traditions, and natural beauty of Dartmoor are safeguarded for
-      future generations to appreciate and enjoy. By supporting our charity, you
-      actively contribute to community engagement, conservation efforts, and
-      educational programs that promote a deep connection to Dartmoor's people
-      and their remarkable history.
-    </p>
-    <Heading text="Apply for Support" level={2} />
-
-    <p>
-      Applying for support from the Dartmoor Trust is a wonderful opportunity
-      for individuals, organizations, and projects that align with our mission
-      of preserving Dartmoor's people and history. Whether you are an aspiring
-      artist looking to promote Dartmoor's cultural heritage, a community group
-      seeking funding for a historical preservation project, or a researcher
-      aiming to uncover new insights into the region's past, the Dartmoor Trust
-      welcomes applications from all those who share a passion for the
-      preservation and celebration of Dartmoor's unique heritage. Our
-      application process is designed to be inclusive and accessible, ensuring
-      that deserving initiatives have the opportunity to receive the support
-      they need. By applying for support from the Dartmoor Trust, you join a
-      community of like-minded individuals and organizations committed to making
-      a positive impact on the preservation and appreciation of Dartmoor's
-      people and history.
-    </p>
-    <p>
-      Before you apply, be sure to read the <a
-        class="link"
-        href="/charity/terms-and-conditions"
-        >terms and conditions of application</a
-      >.
-    </p>
-    <Button
-      text="Download an Application Form"
-      href="https://dartmoor.blob.core.windows.net/assets/DartmoorTrustGrantApplication.doc"
-    />
-    <Heading text="Donations" level={2} />
-    <p class="">
-      We welcome donations to support our work. If you would like to make a
-      simple BACS transfer you may use the details below. Every penny goes into
-      supporting our projects and keeping the work to support Dartmoor alive.
-    </p>
-    <p>
-      NATWEST BANK<br />
-      Sort Code: 54 21 14<br />
-      Account Name: Dartmoor Trust<br />
-      Account Number: 2444 0477
-    </p>
+    <div class="flex flex-col gap-5">
+      <Heading text="Previous Partners" level={2} />
+      <ul>
+        {#each partners as partner}
+          <li>{partner}</li>
+        {/each}
+      </ul>
+    </div>
   </div>
-  <div class="flex flex-col gap-5">
-    <Heading text="Previous Partners" level={2} />
-    <ul>
-      {#each partners as partner}
-        <li>{partner}</li>
-      {/each}
-    </ul>
-  </div>
-</div>
+</Container>
