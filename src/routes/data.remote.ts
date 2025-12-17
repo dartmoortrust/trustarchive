@@ -1,14 +1,14 @@
-import { form, prerender, query } from "$app/server";
+import { form,  query } from "$app/server";
 import { db } from "$lib/server/db";
 import z from "zod";
 
 
-export const getTrustees = prerender(async() => {
+export const getTrustees = query(async() => {
   const trustees = await db.query(`select * from trustees where retired = false order by id`)
   return trustees.rows
 })
 
-export const getTrusteeById = prerender(z.string(), async(id) => {
+export const getTrusteeById = query(z.string(), async(id) => {
   const trustee = await db.query(`
         select * from trustees where slug = $1
     `,[id])
