@@ -99,7 +99,7 @@
       }}
       aria-label="Close"
     >
-      <Icon icon="mdi:close" class="h-6 w-6" />
+      <Icon icon="mdi:close" class="h-6 w-6 text-black" />
     </button>
 
     <div
