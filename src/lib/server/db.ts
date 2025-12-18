@@ -16,6 +16,27 @@ export const db = new Pool({
   },
 });
 
+const runQuery = async (sql: string, params: any = []) => {
+  try {
+    const res = await db.query(sql, params);
+    return res.rows || [];
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const getTrustees = async () => {
+  const trustees = await runQuery(
+    `select * from trustees where retired = false order by id`,
+  );
+  return trustees;
+};
+
+export const getTrustee = async (id: string) => {
+  const trustees =
+    (await runQuery(`SELECT * FROM trustees WHERE slug = $1`, [id])) ?? [];
+  return trustees[0] ?? null;
+};
 
 export const getFile = async (file_id: string) => {
   try {
@@ -28,22 +49,44 @@ export const getFile = async (file_id: string) => {
   }
 };
 
+export const getCollections = async () => {
+  try {
+    const collections = await db.query(`
+		  select id, title as name, code as slug from fonds where public = true  order by name
+	  `);
+    return collections.rows;
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 export const getCollection = async () => {
   const sql = "SELECT id, name from collections order by name";
   const data = await db.query(sql);
   return data.rows;
 };
 
-export const getRecord = async (id: number) => {
-  const sql = `
-		SELECT r.title, r.id, r.file_id, r.detail, ST_asGeoJSON(r.location_geom)::json as geojson, c.name as colname, c.id as colid
-		from records r
-		JOIN collections c on r.collection_id = c.id
-		where r.id = $1
-		LIMIT 1
-	`;
-  const data = await db.query(sql, [id]);
-  return data.rows[0];
+export const getRecord = async (id: string) => {
+  try {
+    const record = await db.query(
+      `
+      SELECT r.title, r.id, r.sha1_hash, r.detail, ST_asGeoJSON(r.location_geom)::json as geojson, r.downloadable,
+      r.date_year, r.date_month, r.date_day, r.mime_type as file_mime,  r.collection_id, fm.medium,
+      r.public, c.title as colname, c.code as colslug, r.location_estimated, r.transform::json, r.caption_front, r.caption_back
+      from files r 
+      LEFT JOIN fonds c on r.collection_id = c.id
+      LEFT JOIN file_mimes fm on fm.mime_type = r.mime_type
+      where r.id = $1
+      LIMIT 1
+    `,
+      [id],
+    );
+    return record.rows[0];
+  } catch (e) {
+    console.log(e);
+
+    return [];
+  }
 };
 
 export const getRandomRecords = async (count: number) => {

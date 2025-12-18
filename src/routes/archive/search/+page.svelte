@@ -81,7 +81,6 @@
       <div class="border-1 border-slate-300 p-2">
         Results are shown with the most relevant records appearing first.
       </div>
-
       <RecordGrid records={data.results} />
     {:else}
       <Heading level={2} text="Search Tips" />

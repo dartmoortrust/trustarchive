@@ -7,7 +7,7 @@
     crop = false,
     size = 500,
     grow = true,
-    lightbox = true,
+    lightbox = false,
   } = $props();
 
   let isOpen = $state(false);

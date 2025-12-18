@@ -1,7 +1,7 @@
 <form action="/archive/search" class="flex">
   <input
     id="query"
-    class="w-full bg-gray-50 p-3 rounded-l-xl focus:border-none"
+    class="w-full bg-gray-50 p-3 border-2 border-slate-200 rounded-l-xl focus:border-none"
     name="q"
     placeholder="Search our Archive"
   />

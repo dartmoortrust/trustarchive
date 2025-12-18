@@ -4,7 +4,6 @@
   import Heading from "$lib/ui/Heading.svelte";
   import Image from "$lib/ui/Image.svelte";
   import Seo from "$lib/ui/SEO.svelte";
-  import { getTrustees } from "../data.remote";
   const partners = [
     "Aune Head",
     "Bellever YHA",
@@ -106,6 +105,8 @@
     "Workshop under the Sky",
     "Wren Trust",
   ];
+  import type { PageProps } from './$types';
+	let { data }: PageProps = $props();
 </script>
 
 <Seo
@@ -150,7 +151,7 @@
       </p>
       <Heading text="Our Trustees" level={2} />
       <div class="grid gap-5 grid-cols-2 md:grid-cols-4">
-        {#each await getTrustees() as { slug, name, image_url }}
+        {#each data.trustees as { slug, name, image_url }}
           <a
             href="/charity/trustee/{slug}"
             class="shadow-md hover:shadow-lg transition bg-white rounded-xl"

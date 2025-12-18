@@ -11,7 +11,7 @@
     </h2>
   {:else}
     <h1
-      class={`text-gray-800 mb-3 text-4xl md:text-5xl ${light ? "text-white" : ""}`}
+      class={`text-gray-800 font-bold mb-3 text-4xl md:text-5xl ${light ? "text-white" : ""}`}
     >
       {text}
     </h1>

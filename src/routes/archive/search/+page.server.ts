@@ -189,12 +189,11 @@ async function executeSearch(
         OR caption_front % $2             -- Trigram Match (caption)
     )
     SELECT 
-      *,
+      sr.* , fm.medium,
       count(*) OVER()::int AS full_count,
-      -- Final Ranking: Tune the weights for desired relevance
-      -- Current weights: FTS Exact Match (3) > FTS Rank (2) > Trigram Similarity (1.5)
       (exact_rank * 2 + combined_similarity * 1.5 + has_exact_match * 3) as rank
-    FROM search_results
+    FROM search_results sr
+    JOIN file_mimes fm ON sr.file_mime = fm.mime_type
     ORDER BY rank DESC
     OFFSET $3
     LIMIT $4`,

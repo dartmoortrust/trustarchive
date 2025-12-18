@@ -1,6 +1,7 @@
 <script lang="ts">
+  import Icon from "@iconify/svelte";
   import AuthButton from "./AuthButton.svelte";
-  import { FacebookLogo, InstagramLogo, XLogo } from "phosphor-svelte";
+  import Link from "./Link.svelte";
 </script>
 
 <footer class="bg-white text-gray-900">
@@ -15,16 +16,17 @@
         >
       </span>
       <span>Charity Number: 1056362</span>
+      <Link href="/docs" text="Docs" />
     </div>
     <div class="flex items-center gap-3 mx-auto">
       <a href="https://www.facebook.com/thedartmoortrust">
-        <FacebookLogo weight="regular" size={32} />
+        <Icon icon="simple-icons:facebook" height="40" />
       </a>
       <a href="https://www.instagram.com/dartmoortrustarchive/?hl=en">
-        <InstagramLogo weight="regular" size={32} />
+        <Icon icon="simple-icons:instagram" height="40" />
       </a>
       <a href="https://twitter.com/dartmoorarchive">
-        <XLogo weight="regular" size={32} />
+        <Icon icon="simple-icons:x" height="30" />
       </a>
       <AuthButton />
     </div>
