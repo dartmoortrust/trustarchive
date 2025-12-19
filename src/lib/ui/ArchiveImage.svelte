@@ -33,7 +33,7 @@
 <svelte:window onkeydown={handleKeydown} />
 {#if record.medium === "video"}
   <img
-    {src}
+    src={src.replace('w-','s-')}
     class={grow ? "w-full" : ""}
     alt={record.title || "An image from the Dartmoor Trust Archive"}
   />
