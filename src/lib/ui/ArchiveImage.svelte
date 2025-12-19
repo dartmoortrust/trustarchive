@@ -11,39 +11,15 @@
   } = $props();
 
   let isOpen = $state(false);
-
-  // Helper function to build image URL
-  function buildImageUrl(
-    hash: string,
-    prefix = "w",
-    imgSize = size,
-    useCrop = crop,
-  ) {
-    const imgproxyurl = `https://boxes.dartmoortrust.org/insecure/rs:${useCrop ? "fill" : "fit"}:${imgSize}:${imgSize}/plain/`;
-    const recordUrl = encodeURIComponent(
-      `https://dartmoor.blob.core.windows.net/public/${hash.slice(0, 2)}/${prefix}-${hash}`,
-    );
-    return `${imgproxyurl}${recordUrl}`;
-  }
-
-  // Computed source URL
-  const src = $derived(
-    record.medium === "audio"
-      ? "/images/speaker.png"
-      : buildImageUrl(record.sha1_hash),
-  );
-
-  const lightboxSrc = $derived(
-    buildImageUrl(record.sha1_hash, "w", 1500, true),
-  );
-
+  let src = $derived(`/api/image?url=${encodeURIComponent(
+      `https://dartmoor.blob.core.windows.net/public/${record.sha1_hash.slice(0, 2)}/w-${record.sha1_hash}`,
+  )}&s=${size}&q=75&c=${crop}`)
   // Keyboard handler for accessibility
   function handleKeydown(e: any) {
     if (e.key === "Escape" && isOpen) {
       isOpen = false;
     }
   }
-
   function toggleLightbox() {
     if (lightbox) {
       isOpen = !isOpen;
@@ -55,7 +31,7 @@
 
 {#if record.medium === "video"}
   <img
-    src={buildImageUrl(record.sha1_hash, "s")}
+    {src}
     class={grow ? "w-full" : ""}
     alt={record.title || "An image from the Dartmoor Trust Archive"}
   />

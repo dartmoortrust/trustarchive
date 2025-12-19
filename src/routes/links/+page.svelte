@@ -2,6 +2,7 @@
   import Container from "$lib/ui/Container.svelte";
   import Flex from "$lib/ui/Flex.svelte";
   import Heading from "$lib/ui/Heading.svelte";
+    import NewImage from "$lib/ui/NewImage.svelte";
 
   const urls = [
     {
