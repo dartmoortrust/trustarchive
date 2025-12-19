@@ -68,7 +68,7 @@
             <VideoPlayer record={data.record} />
           {:else}
             <MobileHidden>
-              <ArchiveImage record={data.record} crop={false} />
+              <ArchiveImage record={data.record} crop={false} lightbox={true} />
             </MobileHidden>
           {/if}
           <Map geojson={data.record.geojson} estimated={data.record.location_estimated} />
