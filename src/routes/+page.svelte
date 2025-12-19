@@ -71,9 +71,9 @@
       </div>
     </div>
     <Image
-      imagesrc="Phoebe_in_later_years.webp"
+      imagesrc="http://dartmoortrust.org/images/Phoebe_in_later_years.webp"
       alt="Phoebe Wortley-Talbot"
-      width={500}
+      size={300}
       grow
     />
   </div>
@@ -107,6 +107,6 @@
         Tony Clark OBE - Chairman
       </p>
     </blockquote>
-    <Image imagesrc="clark.webp" alt="Tony Clark" width={500} grow />
+    <Image imagesrc="http://dartmoortrust.org/images/clark.webp" alt="Tony Clark" size={300} grow />
   </div>
 </div>
