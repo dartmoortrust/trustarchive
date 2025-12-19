@@ -2,6 +2,6 @@
   let { children, cols = 1, gap = 10 } = $props();
 </script>
 
-<div class="grid grid-cols-2 gap-10">
+<div class="grid md:grid-cols-2 gap-10">
   {@render children?.()}
 </div>

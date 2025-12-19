@@ -6,9 +6,9 @@
 
 <footer class="bg-white text-gray-900">
   <div
-    class="container mx-auto py-10 flex flex-col md:flex-row gap-5 justify-between"
+    class="container  md:px-5 mx-auto py-10 flex flex-col md:flex-row gap-5 justify-between"
   >
-    <div class="flex flex-col text-sm grow text-center md:text-left">
+    <div class="flex flex-col text-sm grow items-center md:items-start">
       <span>
         Email: <a
           href="mailto:secretary@dartmoortrust.org"

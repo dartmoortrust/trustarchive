@@ -105,8 +105,8 @@
     "Workshop under the Sky",
     "Wren Trust",
   ];
-  import type { PageProps } from './$types';
-	let { data }: PageProps = $props();
+  import type { PageProps } from "./$types";
+  let { data }: PageProps = $props();
 </script>
 
 <Seo
@@ -115,7 +115,7 @@
 />
 
 <Container py>
-  <div class="grid grid-cols-4 gap-5">
+  <div class="grid md:grid-cols-4 gap-5">
     <div class="col-span-3 flex flex-col gap-5">
       <Heading text="Our Charity" />
       <Heading text="About the Dartmoor Trust" level={2} />

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Flex from "$lib/ui/Flex.svelte";
   import Heading from "$lib/ui/Heading.svelte";
   import Hero from "$lib/ui/Hero.svelte";
   import Image from "$lib/ui/Image.svelte";
@@ -43,44 +42,42 @@
     </p>
   </div>
 </div>
-<div class="grid md:grid-cols-2 gap-5 container md:mx-auto md:px-0 px-5 py-5">
-  <div
-    class="col-span-2 grid grid-cols-3 gap-10 bg-white p-10 rounded-xl text-slate-800"
-  >
-    <div class="gap-10 col-span-2">
-      <div class="space-y-10">
-        <Heading
-          text="THE PHOEBE WORTLEY-TALBOT LEGACY PROJECT 2024-2025"
-          level={2}
-        />
-        <p>
-          Phoebe Wortley-Talbot was born in 1926 and died in 2009 leaving a
-          considerable sum of money in trust for her remaining family to use
-          charitably, much of it supporting projects on her beloved Dartmoor
-          which had been her home for many years. This became the Phoebe
-          Wortley- Talbot Charitable Trust. In 2023 a generous grant was made to
-          the Dartmoor Trust, whose Archive of 100,000 photographs of the moor
-          is dedicated to preserving visual images free to public access. This
-          grant resulted in a two-year programme inviting contemporary artists
-          to provide their own interpretations of the moor. Year 1 resulted in a
-          hugely successful photography exhibition of Dartmoor, while in Year 2
-          (2025) members of the South West Academy of Fine & Applied Arts will
-          provide new interpretations of the moor through paintings and other
-          works of art.
-        </p>
-      </div>
-    </div>
-    <Image
-      imagesrc="http://dartmoortrust.org/images/Phoebe_in_later_years.webp"
-      alt="Phoebe Wortley-Talbot"
-      size={300}
-      grow
+<div class="container md:mx-auto md:px-0 px-5 py-5">
+  <div class="bg-white rounded-xl gap-5 p-5 flex-col flex">
+    <Heading
+      text="THE PHOEBE WORTLEY-TALBOT LEGACY PROJECT 2024-2025"
+      level={2}
     />
+    <div class="flex flex-col gap-5 md:flex-row">
+      <p>
+        Phoebe Wortley-Talbot was born in 1926 and died in 2009 leaving a
+        considerable sum of money in trust for her remaining family to use
+        charitably, much of it supporting projects on her beloved Dartmoor
+        which had been her home for many years. This became the Phoebe
+        Wortley- Talbot Charitable Trust. In 2023 a generous grant was made to
+        the Dartmoor Trust, whose Archive of 100,000 photographs of the moor
+        is dedicated to preserving visual images free to public access. This
+        grant resulted in a two-year programme inviting contemporary artists
+        to provide their own interpretations of the moor. Year 1 resulted in a
+        hugely successful photography exhibition of Dartmoor, while in Year 2
+        (2025) members of the South West Academy of Fine & Applied Arts will
+        provide new interpretations of the moor through paintings and other
+        works of art.
+      </p>
+      <Image
+        imagesrc="http://dartmoortrust.org/images/Phoebe_in_later_years.webp"
+        alt="Phoebe Wortley-Talbot"
+        size={300}
+        grow
+      />
+    </div>
   </div>
-</div>
-<div class="grid md:grid-cols-2 gap-5 container md:mx-auto md:px-0 px-5 py-5">
-  <div class="block md:col-span-2 rounded-xl bg-white md:flex">
-    <blockquote
+</div>  
+<div class="container md:mx-auto md:px-0 px-5 py-5">
+  <div class="bg-white rounded-xl gap-5 p-5 flex-col flex">
+    
+    <div class="flex flex-col gap-5 md:flex-row">
+      <blockquote
       class="space-y-5 p-5 text-xl font-semibold italic text-gray-900"
     >
       <svg
@@ -108,5 +105,7 @@
       </p>
     </blockquote>
     <Image imagesrc="http://dartmoortrust.org/images/clark.webp" alt="Tony Clark" size={300} grow />
+    </div>
   </div>
-</div>
+</div>  
+
