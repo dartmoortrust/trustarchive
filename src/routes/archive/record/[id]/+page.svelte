@@ -27,7 +27,7 @@
     description={data.record.title || "Dartmoor Trust Archive"}
   />
   <div class="md:hidden">
-    <ArchiveImage record={data.record} />
+    <ArchiveImage record={data.record} size={300} crop={true} />
   </div>
   <Container>
     <Flex>
@@ -68,7 +68,7 @@
             <VideoPlayer record={data.record} />
           {:else}
             <MobileHidden>
-              <ArchiveImage record={data.record} size={500} crop={false} lightbox={true} />
+              <ArchiveImage record={data.record} size={500} crop={false} />
             </MobileHidden>
           {/if}
           <Map geojson={data.record.geojson} estimated={data.record.location_estimated} />
