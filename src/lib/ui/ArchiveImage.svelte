@@ -7,7 +7,7 @@
     record,
     size = 200,
     crop = false,
-  }: { record: Record; size: number; crop: boolean } = $props();
+  }: { record: any; size: number; crop: boolean } = $props();
   let src = $derived(getRecordImageWebUrl(record, size, crop));
   let lightboxSrc = $derived(getRecordImageWebUrl(record, 1500, false));
   const toggleLightbox = () => {

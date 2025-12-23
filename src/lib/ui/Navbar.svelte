@@ -43,7 +43,7 @@
 </div>
 
 <!-- Desktop menu -->
-<div class="hidden md:flex justify-stretch gap-10 shadow-md z-10">
+<div class="hidden md:flex justify-stretch gap-10 shadow-md">
   <div class="container mx-auto flex justify-between gap-4">
     <!-- Logo and links -->
     <div class="my-auto flex gap-4 items-center">

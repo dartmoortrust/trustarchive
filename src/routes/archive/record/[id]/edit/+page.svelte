@@ -1,366 +1,430 @@
 <script lang="ts">
-  import type { ActionData, PageData } from "../$types";
-  import Icon from "@iconify/svelte";
-  import { DefaultMarker, MapLibre } from "svelte-maplibre";
-  import { env } from "$env/dynamic/public";
-  import MarkerInfo from "$lib/ui/MarkerInfo.svelte";
-  import { OSGB2latLng } from "$lib/os";
-  import { toast } from "svelte-sonner";
-  import Heading from "$lib/ui/Heading.svelte";
-  import FormInput from "$lib/ui/FormInput.svelte";
-  import ArchiveImageEdit from "$lib/ui/ArchiveImageEdit.svelte";
   import ArchiveImage from "$lib/ui/ArchiveImage.svelte";
+  import Icon from "@iconify/svelte";
+  import Select from "$lib/ui/form/Select.svelte";
+  import Input from "$lib/ui/form/Input.svelte";
+  import Checkbox from "$lib/ui/form/Checkbox.svelte";
+  import TextArea from "$lib/ui/form/TextArea.svelte";
+  import Heading from "$lib/ui/Heading.svelte";
+  import Map from "$lib/ui/Map.svelte";
+  import { toast } from "svelte-sonner";
+  import { OSGB2latLng } from "$lib/os";
+  import { getRecord, updateRecord } from "../../../../data.remote";
+  import { page } from "$app/state";
 
-  let { data, form }: { data: PageData; form: ActionData } = $props();
-  let tab = $state(0);
-  // svelte-ignore state_referenced_locally
-  let originalData = $state(data.record);
-  // svelte-ignore state_referenced_locally
-  let formData = $state(data.record);
-  // Image states
-  async function handleSubmit(event: SubmitEvent) {
-    event.preventDefault();
-
-    const form = event.target as HTMLFormElement;
-    const formDataToSend = new FormData();
-    formDataToSend.append("record_id", originalData.id); // Always include ID
-
-    // Helper function to safely append values to FormData
-    function appendValue(key: string, value: any) {
-      if (value === null || value === undefined || value === "") {
-        // Check for null, undefined, or empty string
-        formDataToSend.append(key, ""); // Or null, or whatever your backend expects for "no value"
-      } else {
-        formDataToSend.append(key, value);
-      }
-    }
-
-    appendValue("title", formData.title); // Use the $state variable for title
-    appendValue("caption", formData.caption);
-    appendValue("date_day", formData.date_day);
-    appendValue("date_month", formData.date_month);
-    appendValue("date_year", formData.date_year);
-    appendValue("detail", formData.detail);
-    appendValue("collection_id", formData.collection_id);
-    appendValue("medium_id", formData.medium_id);
-    appendValue("geojson", JSON.stringify(formData.geojson));
-    appendValue("original_id", formData.original_id);
-    appendValue("image_transform", JSON.stringify(formData.image_transform));
-    appendValue("caption_rear", formData.caption_rear);
-    try {
-      const response = await fetch(form.action, {
-        // Use form.action directly
-        method: form.method,
-        body: formDataToSend, // Send FormData directly
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json(); // Or response.text()
-        console.log(errorData);
-        throw new Error(errorData.message || response.statusText);
-      }
-      const result = await response.json(); // Process successful response
-      console.log("Success:", result);
-      toast.success("Your edits have been saved!");
-    } catch (error) {
-      console.error("Error:", error);
-      toast.error("An error has occured");
-    }
+  // Types for better type safety
+  interface Transform {
+    r?: number; // rotation
+    flip?: boolean; // vertical flip
+    flop?: boolean; // horizontal flip
+    n?: boolean; // negative/invert
   }
+
+  interface Record {
+    transform: Transform;
+    location_estimated?: boolean;
+    [key: string]: any;
+  }
+
+  // Props
+  let { params } = $props();
+
+  // Fetch and initialize data
+  const oldData = await getRecord(params.id);
+
+  // Initialize record state with proper transform object
+  let record = $state<Record>({
+    ...oldData,
+    transform: oldData.transform || {
+      r: 0,
+      flip: false,
+      flop: false,
+      n: false,
+    },
+  });
+
+  // Sync transform to form field
+  updateRecord.fields.set(oldData);
+
+  $effect(() => {
+    updateRecord.fields.transform.set(JSON.stringify(record.transform));
+  });
+  $effect(() => {
+    updateRecord.fields.location_geom.set(JSON.stringify(record.geom));
+  });
+
+  // Location search state
+  let osgr = $state("");
+  let placename = $state("");
+  let placeresults = $state<Array<{ name1: string; coords: [number, number] }>>(
+    [],
+  );
+
+  // Dropdown options
+  const days = Array.from({ length: 31 }, (_, i) => ({
+    value: i + 1,
+    label: String(i + 1),
+  }));
+
+  const months = Array.from({ length: 12 }, (_, i) => ({
+    value: i + 1,
+    label: String(i + 1),
+  }));
+
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => ({
+    value: 1900 + i,
+    label: String(1900 + i),
+  })).reverse(); // Most recent years first
+
+  // Transform manipulation functions
+  const rotate = (degrees: number) => {
+    const currentRotation = record.transform.r || 0;
+    let newRotation = currentRotation + degrees;
+
+    // Normalize rotation to 0-359 range
+    newRotation = ((newRotation % 360) + 360) % 360;
+
+    record.transform = { ...record.transform, r: newRotation };
+  };
+
+  const toggleFlip = () => {
+    record.transform = { ...record.transform, flip: !record.transform.flip };
+  };
+
+  const toggleFlop = () => {
+    record.transform = { ...record.transform, flop: !record.transform.flop };
+  };
+
+  const toggleInvert = () => {
+    record.transform = { ...record.transform, n: !record.transform.n };
+  };
+
+  const resetTransform = () => {
+    record.transform = { r: 0, flip: false, flop: false, n: false };
+  };
+
+  // Location search handlers
+  const handleOSGridSearch = (e: Event) => {
+    e.preventDefault();
+    const cleanRef = osgr.replace(/\s+/g, "").toUpperCase();
+    const match = cleanRef.match(/^([A-Z]{2})(\d{2,10})$/);
+
+    if (!match) {
+      toast.error("Invalid OS Grid reference format");
+      return;
+    }
+
+    try {
+      const ll = OSGB2latLng(osgr);
+      record.geom = [ll.longitude, ll.latitude];
+      toast.success("Location updated");
+    } catch (error) {
+      toast.error("Failed to convert OS Grid reference");
+    }
+  };
+
+  const handlePlaceSearch = async (e: Event) => {
+    e.preventDefault();
+
+    if (!placename.trim()) {
+      toast.error("Please enter a place name");
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `/api/placesearch?q=${encodeURIComponent(placename)}`,
+      );
+      if (!res.ok) throw new Error("Search failed");
+      placeresults = await res.json();
+    } catch (error) {
+      toast.error("Failed to search for place");
+      placeresults = [];
+    }
+  };
+
+  const selectPlace = (name: string, coords: [number, number]) => {
+    record.geom = coords;
+    placeresults = [];
+    updateRecord.fields.location_name.set(name);
+    toast.success("Location updated");
+  };
+
+  // Form submission
+  const handleSubmit = async ({ form, data, submit }: any) => {
+    try {
+      await submit();
+      toast.success("Successfully saved!");
+    } catch (error) {
+      console.error("Save error:", error);
+      toast.error("Failed to save changes");
+    }
+  };
 </script>
 
-<svelte:head>
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/gh/OrdnanceSurvey/os-api-branding@0.3.1/os-api-branding.css"
-  />
-  <script
-    src="https://cdn.jsdelivr.net/gh/OrdnanceSurvey/os-api-branding@0.3.1/os-api-branding.js"
-  ></script>
-</svelte:head>
-{#if data.session.roles?.includes("record-edit")}
-  <div class="container mx-auto py-5 flex flex-col gap-5">
-    <!-- Tabs Box -->
-    <div class="col-span-2 container mx-auto bg-gray-50 p-2 flex gap-2">
-      <button
-        class={`hover:cursor-pointer p-1 text-white  flex ${tab === 0 ? "bg-blue-600" : "bg-blue-200"}`}
-        onclick={() => (tab = 0)}
-      >
-        <Icon icon="akar-icons:edit" width="24" height="24" />
-        Edit Metadata
-      </button>
-      <button
-        class={`hover:cursor-pointer p-1 text-white flex ${tab === 1 ? "bg-pink-600" : "bg-pink-200"}`}
-        onclick={() => (tab = 1)}
-      >
-        <Icon icon="solar:point-on-map-bold-duotone" width="24" height="24" />
-        Edit Location
-      </button>
+<div class="container mx-auto flex flex-row gap-10 p-4">
+  {#if page.data.session.roles?.includes("record-edit")}
+    <!-- Main Form Section -->
+    <div class="basis-2/3">
+      <form class="flex flex-col gap-4" {...updateRecord.enhance(handleSubmit)}>
+        <!-- Hidden fields -->
+        <input type="hidden" {...updateRecord.fields.id.as("text")} />
+        <input type="hidden" {...updateRecord.fields.transform.as("text")} />
+        <input
+          type="hidden"
+          {...updateRecord.fields.location_geom.as("text")}
+        />
 
-      <a
-        href={`/archive/record/${data.record.id}`}
-        class={`p-1 text-white flex bg-gray-600`}
-      >
-        <Icon icon="material-symbols:image-outline" width="24" height="24" />
-        View Record
-      </a>
-      <button
-        class={`p-1 hover:cursor-pointer text-white flex ${tab === 2 ? "bg-green-600" : "bg-green-200"}`}
-        onclick={() => (tab = 2)}
-      >
-        <Icon icon="ri:dashboard-fill" width="24" height="24" />
-        Dashboard
-      </button>
-    </div>
-    <!-- Edit Tabs -->
-    <div id="">
-      <form
-        class="flex flex-col gap-5"
-        action="?/update"
-        method="POST"
-        onsubmit={handleSubmit}
-      >
-        <!-- ID Input Hidden -->
-        {#if tab === 0}
-          <div class="grid grid-cols-2 gap-5" id="tab0">
-            <div class="flex flex-col gap-3">
-              <input type="hidden" name="record_id" value={formData.id} />
-              <div
-                class={`flex-col gap-3 bg-gray-50 p-2 transition-all flex ${formData.original_id !== originalData.original_id ? "bg-green-200" : "bg-gray-50"}`}
-              >
-                <FormInput
-                  bind:value={formData.original_id}
-                  title="Original ID"
-                  hint="If the asset has been given to us and was already given an ID
-                  - enter that here. In many cases this will have been added by
-                  the Archive Admin, it may be something that is used as the
-                  file name"
-                />
-              </div>
+        <!-- Title -->
+        <Input
+          {...updateRecord.fields.title.as("text")}
+          issues={updateRecord.fields.title.issues()}
+          label="Title"
+        />
 
-              <div
-                class={`flex-col gap-3 bg-gray-50 p-2 transition-all flex ${formData.title !== originalData.title ? "bg-green-200" : "bg-gray-50"}`}
-              >
-                <FormInput
-                  bind:value={formData.title}
-                  title="Title"
-                  hint="One sentence that describes this record. Think of this as the headline for the page"
-                />
-              </div>
-              <div
-                class={`flex-col gap-3 bg-gray-50 p-2 transition-all flex ${formData.caption !== originalData.caption ? "bg-green-200" : "bg-gray-50"}`}
-              >
-                <FormInput
-                  bind:value={formData.caption}
-                  title="Caption Front"
-                  hint="Any text that is recorded on the FRONT of the original item - e.g. a
-                  caption on the photograph"
-                />
-              </div>
-              <div
-                class={`flex-col gap-3 bg-gray-50 p-2 transition-all flex ${formData.caption_rear !== originalData.caption_rear ? "bg-green-200" : "bg-gray-50"}`}
-              >
-                <FormInput
-                  bind:value={formData.caption_rear}
-                  title="Caption Rear"
-                  hint="Any text that is recorded on the REAR of the original item - e.g. notes"
-                />
-              </div>
-              <!-- Date Inputs -->
-              <div
-                class={`flex-col gap-3 bg-gray-50 p-2 transition-all flex 
-                ${
-                  formData.date_year !== originalData.date_year ||
-                  formData.date_month !== originalData.date_month ||
-                  formData.date_day !== originalData.date_day
-                    ? "bg-green-200"
-                    : "bg-gray-50"
-                }`}
-              >
-                <label class="text-2xl" for="dates">Date</label>
-                <div class="grid grid-cols-3 gap-3">
-                  <input
-                    class="border-2 p-1"
-                    name="date_day"
-                    type="number"
-                    placeholder="Day"
-                    maxlength={2}
-                    bind:value={formData.date_day}
-                  />
-                  <input
-                    class="border-2 p-1"
-                    name="date_month"
-                    type="number"
-                    maxlength={2}
-                    placeholder="Month"
-                    bind:value={formData.date_month}
-                  />
-                  <input
-                    class="border-2 p-1"
-                    name="date_year"
-                    maxlength={4}
-                    type="number"
-                    placeholder="Year"
-                    bind:value={formData.date_year}
-                  />
-                </div>
-                <div class="text-sm">
-                  Enter any known date information for when the record was
-                  captured. The date a photograph was taken or a document
-                  published. Enter any date information known - e.g. "6" in the
-                  month box for June. The year box should be four digits long.
-                </div>
-              </div>
-              <!-- Detail Input -->
-              <div
-                class={`flex-col gap-3 bg-gray-50 p-2 transition-all flex ${formData.detail !== originalData.detail ? "bg-green-200" : "bg-gray-50"}`}
-              >
-                <label class="text-2xl" for="detail">Detail</label>
-                <textarea
-                  bind:value={formData.detail}
-                  rows="15"
-                  name="detail"
-                  class="border-2 p-1"
-                ></textarea>
-                <div class="flex gap-2 items-center text-sm">
-                  In full prose, describe the record. What is going on? When and
-                  where? Who is in the record?
-                </div>
-              </div>
-              <!-- Collection Input -->
-              <div
-                class={`flex-col gap-3 bg-gray-50 p-2 transition-all flex ${formData.collection_id !== originalData.collection_id ? "bg-green-200" : "bg-gray-50"}`}
-              >
-                <label class="text-2xl" for="detail">Collection</label>
-                <select
-                  name="collection_id"
-                  class="p-3 bg-white"
-                  bind:value={formData.collection_id}
-                >
-                  {#each data.collections as col}
-                    <option
-                      value={col.id}
-                      selected={col.id === formData.collection_id}
-                      >{col.name || `${col.category}/${col.type}`}</option
-                    >
-                  {/each}
-                </select>
-              </div>
-              <!-- Medium Input -->
-              <!-- <div
-                class={`flex-col gap-3 bg-gray-50 p-2 transition-all flex ${formData.medium_id !== originalData.medium_id ? "bg-green-200" : "bg-gray-50"}`}
-              >
-                <label class="text-2xl" for="medium_id">Medium</label>
-                <select
-                  name="medium_id"
-                  class="p-3 bg-white"
-                  bind:value={formData.medium_id}
-                >
-                  {#each data.media as med}
-                    <option
-                      value={med.id}
-                      selected={med.id === formData.medium_id}
-                      >{med.category}/{med.type}</option
-                    >
-                  {/each}[-4, 50]
-                </select>
-              </div> -->
-            </div>
-            <div class="flex flex-col gap-3">
-              <div class="flex">
-                <ArchiveImage record={formData} size={500} crop={false} />
-              </div>
-              <div class="relative flex gap-2 text-3xl"></div>
-              <div class="bg-gray-200 p-3 space-y-3">
-                <div>
-                  File Path: {data.record.file_path}
-                </div>
-                <div>
-                  Notes: {data.record.notes || "None"}
-                </div>
-              </div>
-            </div>
-          </div>
-        {:else if tab == 1}
-          <div class="grid grid-cols-4 gap-3 bg-gray-50 p-2" id="tab1">
-            <div class="col-span-3">
-              <MapLibre
-                onclick={(e) => {
-                  console.log(e.lngLat);
-                  formData.geojson = {
-                    type: "Point",
-                    coordinates: [e.lngLat.lng, e.lngLat.lat],
-                  };
-                }}
-                center={formData.geojson?.coordinates
-                  ? formData.geojson?.coordinates
-                  : [-4, 50.5]}
-                zoom={formData.geojson?.coordinates ? 15 : 8}
-                class="w-full h-[60rem]"
-                standardControls
-                style={`https://api.os.uk/maps/vector/v1/vts/resources/styles?srs=3857&key=${env.PUBLIC_OS_KEY}`}
-              >
-                {#if formData.geojson}
-                  <DefaultMarker
-                    bind:lngLat={formData.geojson.coordinates}
-                    draggable
-                  />
-                {/if}
-              </MapLibre>
-            </div>
-            <div class="flex flex-col gap-5">
-              <MarkerInfo
-                lat={formData.geojson?.coordinates[0]}
-                lng={formData.geojson?.coordinates[1]}
+        <!-- Captions -->
+        <Input
+          {...updateRecord.fields.caption_front.as("text")}
+          issues={updateRecord.fields.caption_front.issues()}
+          label="Caption (front)"
+        />
+
+        <Input
+          {...updateRecord.fields.caption_back.as("text")}
+          issues={updateRecord.fields.caption_back.issues()}
+          label="Caption (back)"
+        />
+
+        <!-- Details -->
+        <TextArea
+          label="Details"
+          maxLength={500}
+          issues={updateRecord.fields.detail.issues()}
+          {...updateRecord.fields.detail.as("text")}
+        />
+
+        <hr class="my-2" />
+
+        <!-- Date Fields -->
+        <div class="flex gap-4 items-end">
+          <Select
+            label="Day"
+            items={days}
+            {...updateRecord.fields.date_day.as("select")}
+          />
+          <Select
+            label="Month"
+            items={months}
+            {...updateRecord.fields.date_month.as("select")}
+          />
+          <Select
+            label="Year"
+            items={years}
+            {...updateRecord.fields.date_year.as("select")}
+          />
+          <Checkbox
+            label="Circa"
+            {...updateRecord.fields.date_estimated.as("checkbox")}
+          />
+        </div>
+
+        <hr class="my-2" />
+
+        <!-- Location Section -->
+        <Heading level={2} text="Location" />
+
+        <!-- Map Component (commented out in original) -->
+        <Map
+          estimated={record.location_estimated}
+          bind:geojson={record.geom}
+          edit={true}
+        />
+        <div class="flex gap-5">
+          <Input
+            {...updateRecord.fields.location_name.as("text")}
+            issues={updateRecord.fields.location_name.issues()}
+            label="Location Name"
+          />
+          <Checkbox
+            label="Estimated"
+            {...updateRecord.fields.location_estimated.as("checkbox")}
+          />
+        </div>
+
+        <!-- Location Search Tools -->
+        <div class="bg-white p-4 rounded border space-y-3">
+          <div class="flex gap-2">
+            <label class="flex-1">
+              <span class="text-sm font-medium">OS Grid Reference</span>
+              <input
+                bind:value={osgr}
+                type="text"
+                placeholder="e.g. TQ 12345 67890"
+                class="w-full border-2 border-gray-300 px-3 py-2 rounded mt-1"
               />
-              <span class="text-sm"
-                >You may enter an OS Grid reference (e.g SX 8325 8553) to add a
-                marker to the map.</span
-              >
-              <div class="flex">
-                <input id="grquery" class="p-1 grow border-2" /><button
-                  class="p-1 bg-yellow-200"
-                  onclick={(e) => {
-                    e.preventDefault();
-                    const gr = document.getElementById("grquery").value;
-                    let ll = OSGB2latLng(gr);
-                    formData.geojson = {
-                      type: "Point",
-                      coordinates: [ll.longitude, ll.latitude],
-                    };
-                  }}>Search</button
-                >
-              </div>
-              <span class="text-sm"
-                >If you wish to remove the marker completely you can by clicking
-                the button below.</span
-              >
-              <button
-                class="p-1 bg-red-500 text-white"
-                onclick={(e) => {
-                  e.preventDefault();
-                  formData.geojson = null;
-                }}>Remove Marker</button
-              >
-            </div>
+            </label>
+            <button
+              type="button"
+              onclick={handleOSGridSearch}
+              class="self-end bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded transition-colors"
+            >
+              Go
+            </button>
           </div>
-        {:else if tab == 2}
-          <div class="flex gap-5 flex-col">
-            <Heading text="Your previous edits" level={2} />
-            <div class="flex flex-col">
-              {#each data.user_edits as edit}
-                <a href={`/archive/record/${edit.id}`}
-                  >{edit.id} | {edit.title}</a
-                >
-              {/each}
-            </div>
+
+          <div class="flex gap-2">
+            <label class="flex-1">
+              <span class="text-sm font-medium">Place Name</span>
+              <input
+                bind:value={placename}
+                type="text"
+                placeholder="Search for a place"
+                class="w-full border-2 border-gray-300 px-3 py-2 rounded mt-1"
+              />
+            </label>
+            <button
+              type="button"
+              onclick={handlePlaceSearch}
+              class="self-end bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded transition-colors"
+            >
+              Search
+            </button>
+          </div>
+        </div>
+
+        <!-- Place Search Results -->
+        {#if placeresults.length > 0}
+          <div class="flex flex-wrap gap-2">
+            {#each placeresults as { name1, coords }}
+              <button
+                type="button"
+                class="bg-white border-2 border-gray-300 hover:border-green-600 p-2 rounded shadow-sm hover:shadow transition-all"
+                onclick={() => selectPlace(name1, coords)}
+              >
+                {name1}
+              </button>
+            {/each}
           </div>
         {/if}
-        <button class="bg-green-800 text-white p-2" type="submit">Save</button>
-        {JSON.stringify(originalData)}
+        <button
+          class="p-3 bg-green-700 hover:bg-green-800 text-white rounded transition-colors font-medium"
+        >
+          Save Changes
+        </button>
       </form>
     </div>
-  </div>
-{:else}
-  Not allowed
-{/if}
+
+    <!-- Preview Section -->
+    <div class="basis-1/3">
+      <div class="sticky top-5 flex flex-col gap-4">
+        <!-- Transform Controls -->
+        <div class="bg-white p-4 rounded border">
+          <h3 class="font-semibold mb-3">Image Transforms</h3>
+          <div class="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onclick={() => rotate(90)}
+              class="bg-gray-200 hover:bg-green-600 hover:text-white p-3 rounded transition-all"
+              title="Rotate clockwise 90°"
+            >
+              <Icon icon="ic:baseline-rotate-right" width="24" />
+            </button>
+
+            <button
+              type="button"
+              onclick={() => rotate(-90)}
+              class="bg-gray-200 hover:bg-green-600 hover:text-white p-3 rounded transition-all"
+              title="Rotate counter-clockwise 90°"
+            >
+              <Icon icon="ic:baseline-rotate-left" width="24" />
+            </button>
+
+            <button
+              type="button"
+              onclick={toggleFlip}
+              class="bg-gray-200 hover:bg-green-600 hover:text-white p-3 rounded transition-all"
+              class:bg-green-600={record.transform.flip}
+              class:text-white={record.transform.flip}
+              title="Flip vertically"
+            >
+              <Icon icon="ic:baseline-swap-vertical-circle" width="24" />
+            </button>
+
+            <button
+              type="button"
+              onclick={toggleFlop}
+              class="bg-gray-200 hover:bg-green-600 hover:text-white p-3 rounded transition-all"
+              class:bg-green-600={record.transform.flop}
+              class:text-white={record.transform.flop}
+              title="Flip horizontally"
+            >
+              <Icon icon="ic:baseline-swap-horizontal-circle" width="24" />
+            </button>
+
+            <button
+              type="button"
+              onclick={toggleInvert}
+              class="bg-gray-200 hover:bg-green-600 hover:text-white p-3 rounded transition-all"
+              class:bg-green-600={record.transform.n}
+              class:text-white={record.transform.n}
+              title="Invert colors"
+            >
+              <Icon icon="ic:baseline-invert-colors" width="24" />
+            </button>
+
+            <button
+              type="button"
+              onclick={resetTransform}
+              class="bg-red-100 hover:bg-red-600 hover:text-white p-3 rounded transition-all ml-auto"
+              title="Reset all transforms"
+            >
+              <Icon icon="ic:baseline-refresh" width="24" />
+            </button>
+          </div>
+
+          <!-- Transform State Display -->
+          <div class="mt-3 p-2 bg-gray-50 rounded text-sm font-mono">
+            <div>Rotation: {record.transform.r || 0}°</div>
+            <div>Flip: {record.transform.flip ? "Yes" : "No"}</div>
+            <div>Flop: {record.transform.flop ? "Yes" : "No"}</div>
+            <div>Invert: {record.transform.n ? "Yes" : "No"}</div>
+          </div>
+        </div>
+
+        <!-- Image Preview -->
+        <div class="bg-white p-4 rounded border">
+          <h3 class="font-semibold mb-3">Preview</h3>
+          <ArchiveImage {record} size={500} crop={false} />
+        </div>
+        <!-- Validation Errors -->
+        {#if updateRecord.fields.allIssues()}
+          <div class="bg-red-50 border border-red-200 rounded p-4">
+            <h3 class="font-semibold text-red-800 mb-2">Validation Errors:</h3>
+            <ul class="space-y-1">
+              {#each updateRecord.fields.allIssues() as issue}
+                <li class="text-red-700 text-sm">
+                  <strong>{issue.path}:</strong>
+                  {issue.message}
+                </li>
+              {/each}
+            </ul>
+          </div>
+        {/if}
+        <!-- Debug Info (optional - remove in production) -->
+        {#if import.meta.env.DEV}
+          <details class="bg-gray-50 p-3 rounded text-xs">
+            <summary class="cursor-pointer font-semibold">Debug Info</summary>
+            <pre class="mt-2 overflow-auto">{JSON.stringify(
+                record,
+                null,
+                2,
+              )}</pre>
+          </details>
+        {/if}
+      </div>
+    </div>
+  {:else}
+    <div>Not allowed</div>
+  {/if}
+</div>
