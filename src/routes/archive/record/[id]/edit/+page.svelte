@@ -11,6 +11,7 @@
   import { OSGB2latLng } from "$lib/os";
   import { getRecord, updateRecord } from "../../../../data.remote";
   import { page } from "$app/state";
+  import HelperBox from "$lib/ui/form/HelperBox.svelte";
 
   // Types for better type safety
   interface Transform {
@@ -138,6 +139,9 @@
       );
       if (!res.ok) throw new Error("Search failed");
       placeresults = await res.json();
+      if (placeresults.length === 0) {
+        toast.info("No place results found, try a different spelling.");
+      }
     } catch (error) {
       toast.error("Failed to search for place");
       placeresults = [];
@@ -182,6 +186,12 @@
           issues={updateRecord.fields.title.issues()}
           label="Title"
         />
+        <HelperBox
+          >Title - One sentence to describe the record. Akin to a headline - for
+          example “A train standing in Princetown station in 1923” The intention
+          is not to describe everything but to summarise the key subject matter
+          of the record.</HelperBox
+        >
 
         <!-- Captions -->
         <Input
@@ -189,13 +199,21 @@
           issues={updateRecord.fields.caption_front.issues()}
           label="Caption (front)"
         />
-
+        <HelperBox
+          >Caption Front - Any text writted on the front of the record where
+          applicable. As close to verbatim as possible retaining text case and
+          any mis-spelling.
+        </HelperBox>
         <Input
           {...updateRecord.fields.caption_back.as("text")}
           issues={updateRecord.fields.caption_back.issues()}
           label="Caption (back)"
         />
-
+        <HelperBox
+          >Caption Back - Any text writted on the back of the record where
+          applicable. As close to verbatim as possible retaining text case and
+          any mis-spelling.
+        </HelperBox>
         <!-- Details -->
         <TextArea
           label="Details"
@@ -203,7 +221,19 @@
           issues={updateRecord.fields.detail.issues()}
           {...updateRecord.fields.detail.as("text")}
         />
-
+        <HelperBox
+          >Detail - This is a place to include all of the known information
+          about the Record that hasn’t been entered elsewhere. You may repeat
+          information if it makes the detailed description clearer to the
+          audience. Ideally we would have several paragraphs here but often
+          there is a shortage of information. Use as many variants of words as
+          possible in the Detail to assist searchers. If the information is from
+          a book or the internet, please provide a reference. Please include
+          information on the photographer/author of a document etc if known. If
+          there is a lengthy description that applies to many images, please
+          contact the Archive Manager, who will enable you to include the
+          information in Dartmoor Data with a link from the Record.
+        </HelperBox>
         <hr class="my-2" />
 
         <!-- Date Fields -->
@@ -228,9 +258,16 @@
             {...updateRecord.fields.date_estimated.as("checkbox")}
           />
         </div>
-
+        <HelperBox>
+          A four digit entry of the year that the asset was created - not the
+          date it was added to the Archive (this is automatically generated).
+          E.g. “1914” for an image taken in the first year of the 1WW. We record
+          the year, month and day separately as we often only have partial
+          information. Please enter a 4 digit number for year, 2 for month and 2
+          for day where known. If not known, leave the appropriate box set to
+          'Unknown'. Select the 'circa' box where this is an estimate.
+        </HelperBox>
         <hr class="my-2" />
-
         <!-- Location Section -->
         <Heading level={2} text="Location" />
 
@@ -251,7 +288,15 @@
             {...updateRecord.fields.location_estimated.as("checkbox")}
           />
         </div>
-
+        <HelperBox>
+          Where known, the location of the image should be recorded. This may be
+          where the image was taken, the location the picture depicts or the
+          asset describes. To do this place a marker upon the Ordnance Survey
+          map. If no location exists, you will see a zoomed-out map of Dartmoor
+          without a marker. If there is an existing location the map will be
+          centred and zoomed on that marker. If the image is a general view,
+          position the pin at the point where the image was taken from.
+        </HelperBox>
         <!-- Location Search Tools -->
         <div class="bg-white p-4 rounded border space-y-3">
           <div class="flex gap-2">
@@ -307,6 +352,12 @@
             {/each}
           </div>
         {/if}
+        <HelperBox>
+          To help with using the map you can search by OS Grid Reference, e.g.
+          SX345456 or search our directory of location names. If you search by
+          name, results will appear above this text. Clicking on the box with
+          your chosen name will move the map to this location.
+        </HelperBox>
         <button
           class="p-3 bg-green-700 hover:bg-green-800 text-white rounded transition-colors font-medium"
         >
