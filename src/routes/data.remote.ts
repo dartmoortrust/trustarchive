@@ -119,6 +119,9 @@ export const getDownloadUrl = query(z.uuid(), async(recordId) => {
     const isAuthenticated = locals.session?.roles?.includes("file-download");
 
     if (isAuthenticated || record.rows[0].downloadable) {
+        await db.query(`INSERT INTO log(message) VALUES ($1)`,[{
+            action: 'download', file_id: record.rows[0].id
+        }])
         const signedUrl = await getSignedUrl(
         record.rows[0].sha1_hash,
         `${record.rows[0].id}.${record.rows[0].mime_type.split("/")[1]}`,
