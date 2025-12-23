@@ -45,6 +45,7 @@
     "node-fetch": "^3.3.2",
     "pg": "^8.16.3",
     "pg-tsquery": "^8.4.2",
+    "quill": "^2.0.3",
     "sharp": "^0.33.5",
     "svelte-maplibre": "^1.2.5",
     "svelte-sonner": "^0.3.28",
