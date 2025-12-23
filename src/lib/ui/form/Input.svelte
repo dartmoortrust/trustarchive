@@ -20,6 +20,8 @@
   {/if}
   <input {...others} class="rounded-lg p-2 bg-white border-gray-200 border-2" />
   {#each issues as issue}
-    <p class="issue">{issue.message}</p>
+    <p class="issue border-l-2 border-red-800 bg-red-300 pl-4 py-2">
+      {issue.message}
+    </p>
   {/each}
 </div>

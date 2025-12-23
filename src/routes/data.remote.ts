@@ -3,12 +3,13 @@ import { recordSchema } from "$lib/schema";
 import { db } from "$lib/server/db";
 import { error } from "@sveltejs/kit";
 import z from "zod";
+import { getSignedUrl } from "$lib/server/files";
 
 
 export const getRecord = query(z.uuid(), async (id) => {
     try {
         let {rows} = await db.query(`
-            SELECT r.id, r.title, r.transform, r.sha1_hash, r.date_day, r.date_month, r.date_year,
+            SELECT r.id, r.title, r.transform, r.sha1_hash, r.date_day, r.date_month, r.date_year, r.downloadable,
             r.caption_front, r.caption_back, r.location_name, r.location_estimated, r.original_id,
             ARRAY[ST_X(location_geom), ST_Y(location_geom)] as geom, r.detail,         
             r.date_estimated, r.sha1_hash, r.mime_type, r.public, c.title as colname, c.code as colslug, c.id as colid,
@@ -81,18 +82,49 @@ export const updateRecord = form(
                 recordData.location_estimated,
                 recordData.original_id
             ];
+            try {
+                await db.query('BEGIN')
+                //Save version
+                await db.query(`
+                    INSERT INTO edit_history(record_id, updated_by, record)
+                    VALUES ($1, $2, $3::json)
+                `,[
+                    recordData.id, locals.session.email, recordData
+                ])
+                const result = await db.query(query, params);
+                await db.query('COMMIT')
+                return { success: true };
 
-            const result = await db.query(query, params);
-
-            if (result.rowCount === 0) {
-                return error(404, { message: "Record not found" });
+            } catch (e) {
+                await db.query('ROLLBACK')
+                console.log(e)
+                return { success: false };
             }
-
-            return { success: true };
-
         } catch (e) {
             console.error('Error updating record:', e);
             return error(500, { message: "Failed to update record" });
         }
     }
 );
+
+export const getDownloadUrl = query(z.uuid(), async(recordId) => {
+    //checkuser
+    const  {locals}  = getRequestEvent();
+    
+    let record = await db.query(
+        "select id, sha1_hash, mime_type, downloadable from files where id = $1",
+        [recordId],
+    );
+
+    const isAuthenticated = locals.session?.roles?.includes("file-download");
+
+    if (isAuthenticated || record.rows[0].downloadable) {
+        const signedUrl = await getSignedUrl(
+        record.rows[0].sha1_hash,
+        `${record.rows[0].id}.${record.rows[0].mime_type.split("/")[1]}`,
+        );
+        return {signedUrl};
+    }
+
+})
+

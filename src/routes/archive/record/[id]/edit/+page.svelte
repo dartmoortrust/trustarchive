@@ -370,7 +370,7 @@
           your chosen name will move the map to this location.
         </HelperBox>
         <button
-          class="p-3 bg-green-700 hover:bg-green-800 text-white rounded transition-colors font-medium"
+          class="p-3 bg-green-700 hover:bg-green-800 hover:cursor-pointer text-white rounded transition-colors font-medium"
         >
           Save Changes
         </button>
