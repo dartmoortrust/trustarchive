@@ -381,6 +381,12 @@
     <div class="basis-1/3">
       <div class="sticky top-5 flex flex-col gap-4">
         <!-- Transform Controls -->
+
+        <!-- Image Preview -->
+        <div class="bg-white p-4 rounded border">
+          <h3 class="font-semibold mb-3">Preview</h3>
+          <ArchiveImage {record} size={500} crop={false} />
+        </div>
         <div class="bg-white p-4 rounded border">
           <h3 class="font-semibold mb-3">Image Transforms</h3>
           <div class="flex flex-wrap gap-2">
@@ -452,12 +458,6 @@
             <div>Flop: {record.transform.flop ? "Yes" : "No"}</div>
             <div>Invert: {record.transform.n ? "Yes" : "No"}</div>
           </div>
-        </div>
-
-        <!-- Image Preview -->
-        <div class="bg-white p-4 rounded border">
-          <h3 class="font-semibold mb-3">Preview</h3>
-          <ArchiveImage {record} size={500} crop={false} />
         </div>
         <!-- Validation Errors -->
         {#if updateRecord.fields.allIssues()}
