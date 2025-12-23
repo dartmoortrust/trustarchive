@@ -15,6 +15,8 @@
   import Link from "$lib/ui/Link.svelte";
   import Icon from "@iconify/svelte";
   import { getRecord } from "../../../data.remote";
+  import SEO from "$lib/ui/SEO.svelte";
+  import { getRecordImageWebUrl } from "$lib/image";
   let { params } = $props();
   const record = $derived(await getRecord(params.id));
 </script>
@@ -22,9 +24,24 @@
 {#if record.public === false}
   <div>This record is not public</div>
 {:else}
-  <Seo
-    title={record.title || "Dartmoor Trust Archive"}
-    description={record.title || "Dartmoor Trust Archive"}
+  <SEO
+    title={record.title || "A record from the Dartmoor Trust Archive"}
+    description={record.detail ||
+      "Historical information from a record depicting life and times on Dartmoor"}
+    keywords={record.title + "dartmoor history photographs heritage"}
+    canonical="https://example.com/products/item"
+    ogType="website"
+    ogImage={record.title || "A record from the Dartmoor Trust Archive"}
+    ogImageAlt="Archive Photograph"
+    jsonLd={{
+      "@context": "https://schema.org",
+      "@type": "Website",
+      name: `${record.title || "A record from the Dartmoor Trust Archive"}`,
+      description:
+        record.detail ||
+        "Historical information from a record depicting life and times on Dartmoor",
+      image: getRecordImageWebUrl(record, 500, false),
+    }}
   />
   <div class="md:hidden">
     <ArchiveImage {record} size={300} crop={true} />

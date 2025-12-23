@@ -1,45 +1,58 @@
 <script lang="ts">
-  import { page } from "$app/state";
-
-  interface Props {
-    title?: string;
-    description?: string;
-    image?: string;
-  }
-
-  let {
-    title = "The Dartmoor Trust | dartmoortrust.org",
-    description = "Dartmoor\'s past, present and future",
-    image = "https://dartmoortrust.org/images/Trust-Logo-330x261.webp",
-  }: Props = $props();
+  export let title: string = "";
+  export let description: string = "";
+  export let keywords: string = "";
+  export let canonical: string = "";
+  export let ogType: string = "website";
+  export let ogImage: string = "";
+  export let ogImageAlt: string = "";
+  export let noindex: boolean = false;
+  export let nofollow: boolean = false;
+  export let jsonLd: Record<string, any> | null = null;
 </script>
 
 <svelte:head>
-  <title>{title} | dartmoortrust.org</title>
-  <meta name="description" content={description} />
-  <meta property="og_site_name" content="“dartmoortrust.org”" />
-  <meta
-    property="og:url"
-    content="https://dartmoortrust.org{page.url.pathname.toString()}"
-  />
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content={title} />
-  <meta property="og:description" content={description} />
-  <meta property="og:image" content={image} />
+  {#if title}
+    <title>{title}</title>
+    <meta property="og:title" content={title} />
+  {/if}
 
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta property="twitter:domain" content="dartmoortrust.org" />
-  <meta
-    property="twitter:url"
-    content="https://dartmoortrust.org{page.url.pathname.toString()}"
-  />
-  <meta name="twitter:title" content={title} />
-  <meta name="twitter:description" content={description} />
-  <meta name="twitter:image" content={image} />
-  {@html `  <script type="application/ld+json">{
-     "@context": "https://schema.org",
-     "@type": "Website",
-     "name": "${title} | dartmoortrust.org",
-     "url": "https//dartmoortrust.org${page.url.pathname}",
-     "logo": "${image}"}</script>`}
+  {#if description}
+    <meta name="description" content={description} />
+    <meta property="og:description" content={description} />
+  {/if}
+
+  {#if keywords}
+    <meta name="keywords" content={keywords} />
+  {/if}
+
+  {#if canonical}
+    <link rel="canonical" href={canonical} />
+    <meta property="og:url" content={canonical} />
+  {/if}
+
+  {#if ogType}
+    <meta property="og:type" content={ogType} />
+  {/if}
+
+  {#if ogImage}
+    <meta property="og:image" content={ogImage} />
+  {/if}
+
+  {#if ogImageAlt}
+    <meta property="og:image:alt" content={ogImageAlt} />
+  {/if}
+
+  {#if noindex || nofollow}
+    <meta
+      name="robots"
+      content="{noindex ? 'noindex' : 'index'},{nofollow
+        ? 'nofollow'
+        : 'follow'}"
+    />
+  {/if}
+
+  {#if jsonLd}
+    {@html `<script type="application/ld+json">${JSON.stringify(jsonLd)}<\/script>`}
+  {/if}
 </svelte:head>
