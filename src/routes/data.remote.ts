@@ -10,7 +10,7 @@ export const getRecord = query(z.uuid(), async (id) => {
         let {rows} = await db.query(`
             SELECT r.id, r.title, r.transform, r.sha1_hash, r.date_day, r.date_month, r.date_year,
             r.caption_front, r.caption_back, r.location_name, r.location_estimated,
-            ARRAY[ST_X(location_geom), ST_Y(location_geom)] as geom,            
+            ARRAY[ST_X(location_geom), ST_Y(location_geom)] as geom, r.detail,         
             r.date_estimated, r.sha1_hash, r.mime_type, r.public, c.title as colname, c.code as colslug, c.id as colid,
             r.transform
             FROM files r
