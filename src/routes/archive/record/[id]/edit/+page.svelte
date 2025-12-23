@@ -9,11 +9,13 @@
   import Heading from "$lib/ui/Heading.svelte";
   import FormInput from "$lib/ui/FormInput.svelte";
   import ArchiveImageEdit from "$lib/ui/ArchiveImageEdit.svelte";
-  import { page } from "$app/state";
+  import ArchiveImage from "$lib/ui/ArchiveImage.svelte";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
   let tab = $state(0);
+  // svelte-ignore state_referenced_locally
   let originalData = $state(data.record);
+  // svelte-ignore state_referenced_locally
   let formData = $state(data.record);
   // Image states
   async function handleSubmit(event: SubmitEvent) {
@@ -266,7 +268,7 @@
             </div>
             <div class="flex flex-col gap-3">
               <div class="flex">
-                <ArchiveImageEdit bind:formData />
+                <ArchiveImage record={formData} size={500} crop={false} />
               </div>
               <div class="relative flex gap-2 text-3xl"></div>
               <div class="bg-gray-200 p-3 space-y-3">
@@ -355,6 +357,7 @@
           </div>
         {/if}
         <button class="bg-green-800 text-white p-2" type="submit">Save</button>
+        {JSON.stringify(originalData)}
       </form>
     </div>
   </div>

@@ -5,8 +5,9 @@
 </script>
 
 <div class="relative w-full">
+  <button onclick={() => (formData.transform.r = 180)}>Rotate</button>
   {#key JSON.stringify(formData.image_transform)}
-    <ArchiveImage record={formData} />
+    <ArchiveImage record={formData} size={500} crop={false} />
   {/key}
   <!-- <div class="absolute top-0 flex gap-1">
     <button

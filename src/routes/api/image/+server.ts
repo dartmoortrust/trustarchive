@@ -7,8 +7,12 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
   const src = url.searchParams.get("url");
   const size = Number(url.searchParams.get("s")) || 500;
   const quality = Number(url.searchParams.get("q")) || 80;
+  const rotate = Number(url.searchParams.get("r")) || 0;
   const crop = url.searchParams.get("c") === "true";
-  console.log(size);
+  const negate = url.searchParams.get("n") === "true";
+  const flip = url.searchParams.get("flip") === "true";
+  const flop = url.searchParams.get("flop") === "true";
+
   if (!src) {
     throw error(400, 'Missing "url" parameter');
   }
@@ -28,15 +32,26 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
     const arrayBuffer = await response.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    const processedImage = await sharp(buffer)
-      .resize({
+    const processedImage = sharp(buffer).resize({
         width: size,
         height: size,
         fit: crop ? "cover" : "inside",
         withoutEnlargement: true,
       })
-      .webp({ quality: quality })
-      .toBuffer();
+      
+    if(rotate !== 0){
+      processedImage.rotate(rotate)
+    }  
+    if(negate){
+      processedImage.negate(negate)
+    } 
+    if(flip){
+      processedImage.flip(flip)
+    }
+    if(flop){
+      processedImage.flop(flop)
+    } 
+    await processedImage.webp({ quality: quality }).toBuffer();
 
     // 5. Return the response
     return new Response(processedImage, {

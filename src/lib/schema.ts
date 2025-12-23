@@ -2,9 +2,21 @@ import z from "zod";
 
 export const recordSchema = z.object({
   id: z.uuid(),
-  title: z.string(),
-  medium: z.string(),
-  sha1_hash: z.string(),
+  title: z.string().min(10, {error: "Title must be longer than 10 characters"}).max(100, {error: "Title must be shorter than 100 characters."}),
+  medium: z.string().default('image'),
+  sha1_hash: z.string().optional(),
+  detail: z.string().max(5000).optional().transform((val) => (val === "" ? null : val)),
+  caption_front: z.string().transform((val) => (val === "" ? null : val)),
+  caption_back: z.string().transform((val) => (val === "" ? null : val)),
+  notes: z.string().optional().transform((val) => (val === "" ? null : val)),
+  date_day: z.string().transform((val) => (val === "" ? null : Number(val))),
+  date_month: z.string().transform((val) => (val === "" ? null : Number(val))),
+  date_year: z.string().transform((val) => (val === "" ? null : Number(val))),
+  date_estimated: z.boolean().default(false),
+  transform: z.string(),
+  location_geom: z.string().optional().transform((val) => (val === "" ? null : val)),
+  location_name: z.string(),
+  location_estimated: z.boolean().default(false),
 });
 
 export type Record = z.infer<typeof recordSchema>;

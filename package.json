@@ -38,6 +38,7 @@
     "@tailwindcss/vite": "^4.1.18",
     "algoliasearch": "^5.46.0",
     "bcrypt": "^5.1.1",
+    "bits-ui": "^2.14.4",
     "marked": "^17.0.1",
     "mt-latlon": "^0.1.2",
     "mt-osgridref": "^0.1.0",

@@ -14,64 +14,67 @@
   import Markdown from "$lib/ui/Markdown.svelte";
   import Link from "$lib/ui/Link.svelte";
   import Icon from "@iconify/svelte";
-  import type { PageProps } from './$types';
-
-  let { data }: PageProps = $props();
+  import { getRecord } from "../../../data.remote";
+  let { params } = $props();
+  const record = $derived(await getRecord(params.id));
 </script>
 
-{#if data.record.public == false}
+{#if record.public === false}
   <div>This record is not public</div>
 {:else}
   <Seo
-    title={data.record.title || "Dartmoor Trust Archive"}
-    description={data.record.title || "Dartmoor Trust Archive"}
+    title={record.title || "Dartmoor Trust Archive"}
+    description={record.title || "Dartmoor Trust Archive"}
   />
   <div class="md:hidden">
-    <ArchiveImage record={data.record} size={300} crop={true} />
+    <ArchiveImage {record} size={300} crop={true} />
   </div>
   <Container>
     <Flex>
-      <Heading text={data.record.title} />
+      <Heading text={record.title} />
       <Grid cols={2}>
         <Flex>
           <div class="bg-white p-2 shadow">
             <div class="flex items-center gap-2">
               <Icon icon="solar:box-broken" />Collection:
               <Link
-                href={`/archive/collection/${data.record.colslug}`}
-                text={data.record.colname + " Collection"}
+                href={`/archive/collection/${record.colslug}`}
+                text={record.colname + " Collection"}
               />
             </div>
             <div class="flex items-center gap-2">
-              <Icon icon="solar:calendar-broken" />Date: {`${data.record.date_day || "?"}/${data.record.date_month || "?"}/${data.record.date_year || "?"}`}
+              <Icon icon="solar:calendar-broken" />Date: {`${record.date_day || "?"}/${record.date_month || "?"}/${record.date_year || "?"} ${record.date_estimated ? "(circa)" : ""}`}
             </div>
             <div class="flex items-center gap-2">
-              <Icon icon="solar:pen-outline" />Caption (front): {data.record.caption_front ||
+              <Icon icon="solar:pen-outline" />Caption (front): {record.caption_front ||
                 "?"}
             </div>
             <div class="flex items-center gap-2">
-              <Icon icon="solar:pen-outline" />Caption (rear): {data.record.caption_rear ||
+              <Icon icon="solar:pen-outline" />Caption (rear): {record.caption_rear ||
+                "?"}
+            </div>
+            <div class="flex items-center gap-2">
+              <Icon icon="solar:point-on-map-bold-duotone" />Location Name: {record.location_name ||
                 "?"}
             </div>
           </div>
           <div class="flex gap-2">
-            <DownloadButton record={data.record} />
-            <EditButton record={data.record} />
+            <DownloadButton {record} />
+            <EditButton {record} />
           </div>
-
-          <Markdown md={data.record.detail || ""} />
+          <Markdown md={record.detail || ""} />
         </Flex>
         <Flex>
-          {#if data.record.file_mime.startsWith("audio")}
-            <AudioPlayer record={data.record} />
-          {:else if data.record.file_mime.startsWith("video")}
-            <VideoPlayer record={data.record} />
+          {#if record.mime_type.startsWith("audio")}
+            <AudioPlayer {record} />
+          {:else if record.mime_type.startsWith("video")}
+            <VideoPlayer {record} />
           {:else}
             <MobileHidden>
-              <ArchiveImage record={data.record} size={500} crop={false} />
+              <ArchiveImage {record} size={500} crop={false} />
             </MobileHidden>
           {/if}
-          <Map geojson={data.record.geojson} estimated={data.record.location_estimated} />
+          <Map geojson={record.geom} estimated={record.location_estimated} />
         </Flex>
       </Grid>
     </Flex>

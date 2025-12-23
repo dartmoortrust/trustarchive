@@ -6,7 +6,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
   const sql = `
 		SELECT 
-      r.title, r.original_id, r.id, r.sha1_hash, r.detail, ST_asGeoJSON(r.location_geom)::json as geojson, 
+      r.title, r.original_id, r.id, r.sha1_hash, r.detail, ST_asGeoJSON(r.location_geom)::json->'coordinates' as geojson, 
       r.caption_front, r.caption_back,
 		  r.date_year, r.date_month, r.date_day, r.date_estimated, 
       c.title as col_name, r.collection_id, 

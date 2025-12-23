@@ -3,28 +3,31 @@
   import { getRecordImageWebUrl } from "$lib/image";
   import { fade } from "svelte/transition";
   import Icon from "@iconify/svelte";
-  let {record, size = 200, crop = false}:{record: Record, size:number, crop:boolean} = $props();
+  let {
+    record,
+    size = 200,
+    crop = false,
+  }: { record: Record; size: number; crop: boolean } = $props();
   let src = $derived(getRecordImageWebUrl(record, size, crop));
-  let lightboxSrc = $derived(getRecordImageWebUrl(record, 1500, false))
+  let lightboxSrc = $derived(getRecordImageWebUrl(record, 1500, false));
   const toggleLightbox = () => {
-    isOpen = !isOpen
-  }
+    isOpen = !isOpen;
+  };
   function handleKeydown(e: any) {
     if (e.key === "Escape" && isOpen) {
       isOpen = false;
     }
   }
-  let isOpen = $state(false)
+  let isOpen = $state(false);
 </script>
-<button onclick={() => toggleLightbox()} class="w-full hover:cursor-pointer">
-  <img {src} width={size} alt={record.title || 'unknown'} class="w-full"  />
+
+<button onclick={() => toggleLightbox()} class="hover:cursor-pointer w-full">
+  <img {src} width={size} alt={record.title || "unknown"} class="w-full" />
 </button>
 <svelte:window onkeydown={handleKeydown} />
-
-
 {#if isOpen}
   <div
-    class="bg-opacity-75 fixed inset-0 z-50 flex items-center justify-center bg-black"
+    class="bg-opacity-75 fixed inset-0 z-10 flex items-center justify-center bg-black"
     onclick={toggleLightbox}
     onkeydown={(e) => e.key === "Enter" && toggleLightbox()}
     role="button"
