@@ -74,6 +74,10 @@
               <Icon icon="solar:point-on-map-bold-duotone" />Location Name: {record.location_name ||
                 "?"}
             </div>
+            <div class="flex items-center gap-2">
+              <Icon icon="solar:layers-minimalistic-linear" />Original ID: {record.original_id ||
+                "?"}
+            </div>
           </div>
           <div class="flex gap-2">
             <DownloadButton {record} />

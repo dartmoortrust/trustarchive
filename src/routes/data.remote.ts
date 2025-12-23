@@ -9,7 +9,7 @@ export const getRecord = query(z.uuid(), async (id) => {
     try {
         let {rows} = await db.query(`
             SELECT r.id, r.title, r.transform, r.sha1_hash, r.date_day, r.date_month, r.date_year,
-            r.caption_front, r.caption_back, r.location_name, r.location_estimated,
+            r.caption_front, r.caption_back, r.location_name, r.location_estimated, r.original_id,
             ARRAY[ST_X(location_geom), ST_Y(location_geom)] as geom, r.detail,         
             r.date_estimated, r.sha1_hash, r.mime_type, r.public, c.title as colname, c.code as colslug, c.id as colid,
             r.transform
@@ -59,7 +59,8 @@ export const updateRecord = form(
                             ELSE ST_SetSRID(ST_MakePoint($11::float8, $12::float8), 4326)
                         END,
                     location_name = $13,
-                    location_estimated = $14
+                    location_estimated = $14,
+                    original_id = $15
                 WHERE id = $1
                 RETURNING id
             `;
@@ -77,7 +78,8 @@ export const updateRecord = form(
                 locationGeom[0],
                 locationGeom[1],
                 recordData.location_name,
-                recordData.location_estimated
+                recordData.location_estimated,
+                recordData.original_id
             ];
 
             const result = await db.query(query, params);

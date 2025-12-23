@@ -214,6 +214,17 @@
           applicable. As close to verbatim as possible retaining text case and
           any mis-spelling.
         </HelperBox>
+        <!-- Original ID -->
+        <Input
+          {...updateRecord.fields.original_id.as("text")}
+          issues={updateRecord.fields.original_id.issues()}
+          label="Original ID"
+        />
+        <HelperBox
+          >Original ID - This is rarely needed. If an item has a reference
+          number pertaining to the collection it can be recorded here. This is
+          typical in more established collections like Chapman or Burnard.
+        </HelperBox>
         <!-- Details -->
         <TextArea
           label="Details"

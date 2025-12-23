@@ -17,6 +17,7 @@ export const recordSchema = z.object({
   location_geom: z.string().optional().transform((val) => (val === "" ? null : val)),
   location_name: z.string(),
   location_estimated: z.boolean().default(false),
+  original_id: z.string()
 });
 
 export type Record = z.infer<typeof recordSchema>;
