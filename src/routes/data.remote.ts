@@ -1,7 +1,7 @@
 import { form, getRequestEvent, query } from "$app/server";
 import { recordSchema } from "$lib/schema";
 import { db } from "$lib/server/db";
-import { error } from "@sveltejs/kit";
+import { error, redirect } from "@sveltejs/kit";
 import z from "zod";
 import { getSignedUrl } from "$lib/server/files";
 

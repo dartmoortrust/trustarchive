@@ -1,41 +1,52 @@
-<script lang="ts">
-  import { run } from 'svelte/legacy';
-
-  import { removeToast, toasts } from "$lib/toastStore";
-  import Icon from "@iconify/svelte";
-
-  let toastsList: { id: number; message: string; type: string }[] = $state([]);
-
-  // Subscribe to the toast store
-  run(() => {
-    $toasts, (toastsList = $toasts);
-  });
-  function closeToast(id: number) {
-    removeToast(id);
-  }
+<script>
+  import { toasts, removeToast } from '$lib/toastStore';
+  import { flip } from 'svelte/animate';
+  import { fly } from 'svelte/transition';
 </script>
 
-<div class="toast-container absolute top-5 right-5 space-y-5">
-  {#each toastsList as { id, message, type } (id)}
+<div class="toast-container">
+  {#each $toasts as toast (toast.id)}
     <div
-      class="relative gap-4 flex items-center border-2 border-gray-400 bg-white text-black px-4"
+      animate:flip={{ duration: 300 }}
+      transition:fly={{ y: 20, duration: 300 }}
+      class="toast {toast.type}"
     >
-      <!-- <Icon
-        icon="hugeicons:information-circle"
-        class="font-light"
-        height="25"
-      /> -->
-      <span class="p-3">{message}</span>
-      <button class="close-btn" onclick={() => closeToast(id)}
-        ><Icon
-          class="font-light font-gray-400"
-          icon="lucide:circle-x"
-          height="25"
-        /></button
-      >
+      <span class="message">{toast.message}</span>
+      <button onclick={() => removeToast(toast.id)}>✕</button>
     </div>
   {/each}
 </div>
 
 <style>
+  .toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 9999;
+  }
+
+  .toast {
+    padding: 12px 20px;
+    border-radius: 8px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .info { background: #3b82f6; }
+  .success { background: #10b981; }
+  .error { background: #ef4444; }
+
+  button {
+    background: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+  }
 </style>

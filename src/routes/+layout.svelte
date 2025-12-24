@@ -17,7 +17,7 @@
   ></script>
 </svelte:head>
 <div class="flex min-h-screen flex-col">
-  <Toaster position="top-center" />
+  <Toaster position="top-center" expand={true} richColors />
   <Navbar />
   <main class="flex-1 bg-[#f7f7f7] text-gray-800">
     <svelte:boundary onerror={(e) => console.log(e)}>

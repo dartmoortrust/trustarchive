@@ -32,7 +32,7 @@
 
   // Fetch and initialize data
   const oldData = await getRecord(params.id);
-
+  const toasts = $state([])
   // Initialize record state with proper transform object
   let record = $state<Record>({
     ...oldData,
@@ -156,9 +156,9 @@
   };
 
   // Form submission
-  const handleSubmit = async ({ form, data, submit }: any) => {
+  const handleSubmit = ({ form, data, submit }: any) => {
     try {
-      await submit();
+      submit()
       toast.success("Successfully saved!");
     } catch (error) {
       console.error("Save error:", error);
@@ -166,7 +166,11 @@
     }
   };
 </script>
-
+<div class="absolute z-10">
+  {#each toasts as toast}
+    <div class="p-5 bg-black">TOAST</div>
+    {/each}
+</div>
 <div class="container mx-auto flex flex-row gap-10 p-4">
   {#if page.data.session.roles?.includes("record-edit")}
     <!-- Main Form Section -->
@@ -188,7 +192,7 @@
         />
         <HelperBox
           >Title - One sentence to describe the record. Akin to a headline - for
-          example “A train standing in Princetown station in 1923” The intention
+          example "A train standing in Princetown station in 1923" The intention
           is not to describe everything but to summarise the key subject matter
           of the record.</HelperBox
         >
@@ -234,7 +238,7 @@
         />
         <HelperBox
           >Detail - This is a place to include all of the known information
-          about the Record that hasn’t been entered elsewhere. You may repeat
+          about the Record that hasn't been entered elsewhere. You may repeat
           information if it makes the detailed description clearer to the
           audience. Ideally we would have several paragraphs here but often
           there is a shortage of information. Use as many variants of words as
@@ -272,7 +276,7 @@
         <HelperBox>
           A four digit entry of the year that the asset was created - not the
           date it was added to the Archive (this is automatically generated).
-          E.g. “1914” for an image taken in the first year of the 1WW. We record
+          E.g. "1914" for an image taken in the first year of the 1WW. We record
           the year, month and day separately as we often only have partial
           information. Please enter a 4 digit number for year, 2 for month and 2
           for day where known. If not known, leave the appropriate box set to
@@ -315,6 +319,11 @@
               <span class="text-sm font-medium">OS Grid Reference</span>
               <input
                 bind:value={osgr}
+                onkeydown={(e) => {
+                  if(e.key === 'Enter'){
+                    handleOSGridSearch(e)
+                  }
+                }}
                 type="text"
                 placeholder="e.g. TQ 12345 67890"
                 class="w-full border-2 border-gray-300 px-3 py-2 rounded mt-1"
@@ -322,7 +331,7 @@
             </label>
             <button
               type="button"
-              onclick={handleOSGridSearch}
+              onclick={(e) => handleOSGridSearch(e)}
               class="self-end bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded transition-colors"
             >
               Go
@@ -335,13 +344,18 @@
               <input
                 bind:value={placename}
                 type="text"
+                onkeydown={(e) => {
+                  if(e.key === 'Enter'){
+                    handlePlaceSearch(e)
+                  }
+                }}
                 placeholder="Search for a place"
                 class="w-full border-2 border-gray-300 px-3 py-2 rounded mt-1"
               />
             </label>
             <button
               type="button"
-              onclick={handlePlaceSearch}
+              onclick={(e) => handlePlaceSearch(e)}
               class="self-end bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded transition-colors"
             >
               Search
@@ -356,7 +370,11 @@
               <button
                 type="button"
                 class="bg-white border-2 border-gray-300 hover:border-green-600 p-2 rounded shadow-sm hover:shadow transition-all"
-                onclick={() => selectPlace(name1, coords)}
+                onclick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  selectPlace(name1, coords);
+                }}
               >
                 {name1}
               </button>
@@ -370,6 +388,7 @@
           your chosen name will move the map to this location.
         </HelperBox>
         <button
+          type="submit"
           class="p-3 bg-green-700 hover:bg-green-800 hover:cursor-pointer text-white rounded transition-colors font-medium"
         >
           Save Changes
