@@ -5,7 +5,7 @@ import { error } from "@sveltejs/kit";
 import z from "zod";
 import { getSignedUrl } from "$lib/server/files";
 
-export const getTrustees = prerender(async() => {
+export const getTrustees = query(async() => {
     const {rows} = await db.query(
     `select * from trustees where retired = false order by id`,
   );
