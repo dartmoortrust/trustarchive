@@ -29,7 +29,7 @@
     description={record.detail ||
       "Historical information from a record depicting life and times on Dartmoor"}
     keywords={record.title + "dartmoor history photographs heritage"}
-    canonical="https://example.com/products/item"
+    canonical={`https://dartmoortrust.org/archive/record/${record.id}`}
     ogType="website"
     ogImage={record.title || "A record from the Dartmoor Trust Archive"}
     ogImageAlt="Archive Photograph"
@@ -40,7 +40,7 @@
       description:
         record.detail ||
         "Historical information from a record depicting life and times on Dartmoor",
-      image: getRecordImageWebUrl(record, 500, false),
+      image: record.mime_type.startsWith('image') ? getRecordImageWebUrl(record, 500, false) : null,
     }}
   />
   <div class="md:hidden">

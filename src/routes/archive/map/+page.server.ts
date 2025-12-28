@@ -11,13 +11,13 @@ export const load = (async () => {
             'properties', jsonb_build_object(
                 'id', id,
                 'title', title,
-                'file_id', file_id
+                'sha1_hash', sha1_hash
             )
         ))
     ) AS geojson
     FROM (
-        SELECT location_geom, id, file_id, title
-        FROM records     
+        SELECT location_geom, id, sha1_hash, title
+        FROM files     
         WHERE location_geom IS NOT NULL          
     ) AS row;
     `);

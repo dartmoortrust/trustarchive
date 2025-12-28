@@ -1,10 +1,16 @@
-import { form, getRequestEvent, query } from "$app/server";
+import { form, getRequestEvent, prerender, query } from "$app/server";
 import { recordSchema } from "$lib/schema";
 import { db } from "$lib/server/db";
-import { error, redirect } from "@sveltejs/kit";
+import { error } from "@sveltejs/kit";
 import z from "zod";
 import { getSignedUrl } from "$lib/server/files";
 
+export const getTrustees = prerender(async() => {
+    const {rows} = await db.query(
+    `select * from trustees where retired = false order by id`,
+  );
+  return rows;
+})
 
 export const getRecord = query(z.uuid(), async (id) => {
     try {
@@ -93,12 +99,14 @@ export const updateRecord = form(
                 ])
                 const result = await db.query(query, params);
                 await db.query('COMMIT')
+                console.log("Saved")
                 return { success: true };
 
             } catch (e) {
                 await db.query('ROLLBACK')
                 console.log(e)
-                return { success: false };
+                return error(500, { message: "Failed to update record" });
+
             }
         } catch (e) {
             console.error('Error updating record:', e);

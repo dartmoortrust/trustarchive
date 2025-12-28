@@ -5,7 +5,7 @@
   );
 </script>
 
-{#if record.file_mime.startsWith("video")}
+{#if record.mime_type.startsWith("video")}
   <video controls class="max-h-[80vh] w-full bg-black">
     <source {src} type="video/webm" />
     <track

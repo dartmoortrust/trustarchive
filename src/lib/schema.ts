@@ -2,7 +2,7 @@ import z from "zod";
 
 export const recordSchema = z.object({
   id: z.uuid(),
-  title: z.string().min(10, {error: "Title must be longer than 10 characters"}).max(100, {error: "Title must be shorter than 100 characters."}),
+  title: z.string().min(10, {error: "Title must be longer than 10 characters"}).max(200, {error: "Title must be shorter than 200 characters."}),
   medium: z.string().default('image'),
   sha1_hash: z.string().optional(),
   detail: z.string().max(5000).optional().transform((val) => (val === "" ? null : val)),

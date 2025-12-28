@@ -156,9 +156,10 @@
   };
 
   // Form submission
-  const handleSubmit = ({ form, data, submit }: any) => {
+  const handleSubmit = async ({ form, data, submit }: any) => {
     try {
-      submit()
+      let resp = await submit()
+      console.log(form.result)
       toast.success("Successfully saved!");
     } catch (error) {
       console.error("Save error:", error);
@@ -166,11 +167,7 @@
     }
   };
 </script>
-<div class="absolute z-10">
-  {#each toasts as toast}
-    <div class="p-5 bg-black">TOAST</div>
-    {/each}
-</div>
+
 <div class="container mx-auto flex flex-row gap-10 p-4">
   {#if page.data.session.roles?.includes("record-edit")}
     <!-- Main Form Section -->
