@@ -4,7 +4,7 @@ export const recordSchema = z.object({
   id: z.uuid(),
   title: z.string().min(10, {error: "Title must be longer than 10 characters"}).max(200, {error: "Title must be shorter than 200 characters."}),
   medium: z.string().default('image'),
-  sha1_hash: z.string().optional(),
+  sha1_hash: z.string(),
   detail: z.string().max(5000).optional().transform((val) => (val === "" ? null : val)),
   caption_front: z.string().transform((val) => (val === "" ? null : val)),
   caption_back: z.string().transform((val) => (val === "" ? null : val)),
@@ -17,7 +17,8 @@ export const recordSchema = z.object({
   location_geom: z.string().optional().transform((val) => (val === "" ? null : val)),
   location_name: z.string(),
   location_estimated: z.boolean().default(false),
-  original_id: z.string()
+  original_id: z.string(),
+  mime_type: z.string()
 });
 
 export type Record = z.infer<typeof recordSchema>;
