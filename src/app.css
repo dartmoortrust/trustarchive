@@ -6,11 +6,26 @@ root {
   --color-trust-d: #354f52;
   --color-trust-e: #2f3e46;
 }
-@import "tailwindcss";
+@import "tailwindcss"; 
 
 body {
   font-family: "Lato", sans-serif;
   font-optical-sizing: auto;
+  font-size: 16px;
 }
 
 
+/* 
+h1 {
+  font-size: 3em;
+  font-weight: 600;
+  color: #2f3e46;
+}
+
+
+
+.container {
+  padding:0.01em 16px;
+  margin: auto;
+  max-width: 75%;
+} */

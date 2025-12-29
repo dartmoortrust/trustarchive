@@ -21,6 +21,7 @@
   const record = $derived(await getRecord(params.id));
 </script>
 
+
 {#if record.public === false}
   <div>This record is not public</div>
 {:else}
@@ -59,25 +60,35 @@
                 text={record.colname + " Collection"}
               />
             </div>
+            {#if record.date_day || record.date_month || record.date_month}
             <div class="flex items-center gap-2">
               <Icon icon="solar:calendar-broken" />Date: {`${record.date_day || "?"}/${record.date_month || "?"}/${record.date_year || "?"} ${record.date_estimated ? "(circa)" : ""}`}
             </div>
+            {/if}
+            {#if record.caption_front}
             <div class="flex items-center gap-2">
               <Icon icon="solar:pen-outline" />Caption (front): {record.caption_front ||
                 "?"}
             </div>
+            {/if}
+            {#if record.caption_rear}
             <div class="flex items-center gap-2">
               <Icon icon="solar:pen-outline" />Caption (rear): {record.caption_rear ||
                 "?"}
             </div>
+            {/if}
+            {#if record.location_name}
             <div class="flex items-center gap-2">
               <Icon icon="solar:point-on-map-bold-duotone" />Location Name: {record.location_name ||
                 "?"}
             </div>
+            {/if}
+            {#if record.original_id}
             <div class="flex items-center gap-2">
               <Icon icon="solar:layers-minimalistic-linear" />Original ID: {record.original_id ||
                 "?"}
             </div>
+            {/if}
           </div>
           <div class="flex gap-2">
             <DownloadButton {record} />
