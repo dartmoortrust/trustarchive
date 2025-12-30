@@ -2,7 +2,7 @@
   let { alt, imagesrc, size = 300, crop = false, grow = false } = $props();
 
   const src = $derived(
-    `https://boxes.dartmoortrust.org/insecure/rs:${crop ? "fill" : "fit"}:${size}:${size}/plain/${encodeURIComponent(imagesrc)}`,
+    `/api/image?url=${encodeURIComponent(imagesrc)}&s=${size}`,
   );
 </script>
 
