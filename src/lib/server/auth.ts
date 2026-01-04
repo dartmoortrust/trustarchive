@@ -1,17 +1,15 @@
 // src/lib/auth.js
 import { randomUUID } from "crypto";
 import bcrypt from "bcrypt";
-import { db } from "./db";
 import { sendEmail } from "./email";
+import { sql } from "bun";
 
 export class Auth {
   static async setPassword(key: string, password: string) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const update = await db.query(
-      `update users set password = $1, reset_key = null where reset_key = $2`,
-      [hashedPassword, key],
-    );
+    const update =
+      await sql`update users set password = ${hashedPassword}, reset_key = null where reset_key = ${key}`;
     if (update.rowCount === 1) {
       return true;
     }
@@ -19,10 +17,8 @@ export class Auth {
   }
   static async resetPassword(email: string) {
     const salt = bcrypt.genSaltSync(10);
-    const update = await db.query(
-      `update users set reset_key = $1 where email = $2`,
-      [salt, email],
-    );
+    const update =
+      await sql`update users set reset_key = ${salt} where email = ${email}`;
     if (update.rowCount === 1) {
       const message = `To set a new password please click <a href='https://dartmoortrust.org/auth/reset?id=${salt}'>here</a>.`;
       await sendEmail(email.toLowerCase(), message);
@@ -45,60 +41,55 @@ export class Auth {
     return session;
   }
   static async login(email: string, password: string) {
-    const { rows } = await db.query("SELECT * FROM users WHERE email = $1", [
-      email.toLowerCase(),
-    ]);
+    try {
+      const rows = await sql`SELECT * FROM users WHERE email = ${email}`;
 
-    const user = rows[0];
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      throw new Error("Invalid credentials");
+      const user = rows[0];
+      if (!user || !(await bcrypt.compare(password, user.password))) {
+        throw new Error("Invalid credentials");
+      }
+
+      // Create session
+      const sessionId = randomUUID();
+      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+      await sql`INSERT INTO sessions (id, user_id, expires_at) VALUES (${sessionId}, ${user.id}, ${expiresAt})`;
+
+      return {
+        sessionId,
+        user: { id: user.id, email: user.email.toLowerCase(), name: user.name },
+      };
+    } catch (e) {
+      console.error(e);
     }
-
-    // Create session
-    const sessionId = randomUUID();
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
-
-    await db.query(
-      "INSERT INTO sessions (id, user_id, expires_at) VALUES ($1, $2, $3)",
-      [sessionId, user.id, expiresAt],
-    );
-
-    return {
-      sessionId,
-      user: { id: user.id, email: user.email.toLowerCase(), name: user.name },
-    };
   }
 
   static async signup(email: string, password: string, name: string) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const { rows } = await db.query(
-      "INSERT INTO users (email, password,name) VALUES ($1, $2, $3) RETURNING id, email",
-      [email.toLowerCase(), hashedPassword, name],
-    );
+    const rows =
+      await sql`INSERT INTO users (email, password,name) VALUES (${email.toLowerCase()}, ${hashedPassword}, ${name}) RETURNING id, email`;
 
     const user = rows[0];
     const sessionId = randomUUID();
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-    await db.query(
-      "INSERT INTO sessions (id, user_id, expires_at) VALUES ($1, $2, $3)",
-      [sessionId, user.id, expiresAt],
-    );
+    await sql`INSERT INTO sessions (id, user_id, expires_at) VALUES (${sessionId}, ${user.id}, ${expiresAt})`;
 
     return { sessionId, user: { id: user.id, email: user.email } };
   }
 
   static async getSession(sessionId: string) {
-    const { rows } = await db.query(
-      "SELECT s.*, u.name, u.email, u.roles, u.id FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.id = $1 AND s.expires_at > NOW()",
-      [sessionId],
-    );
+    const rows = await sql`
+      SELECT s.*, u.name, u.email, u.roles, u.id
+      FROM sessions s 
+      JOIN users u ON s.user_id = u.id 
+      WHERE s.id = ${sessionId} AND s.expires_at > NOW()`;
 
     return rows[0] || null;
   }
 
   static async logout(sessionId: string) {
-    await db.query("DELETE FROM sessions WHERE id = $1", [sessionId]);
+    await sql`DELETE FROM sessions WHERE id = ${sessionId}`;
   }
 }

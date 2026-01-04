@@ -1,6 +1,5 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
-
   let { href, text } = $props();
 </script>
 

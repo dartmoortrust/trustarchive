@@ -1,82 +1,36 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
   import Icon from "@iconify/svelte";
-
-  const { totalPages, currentPage, onPageChange } = $props<{
-    totalPages: number;
-    currentPage: number;
-    onPageChange: (page: number) => void;
+  import { page } from '$app/state';
+  const { pagination } = $props<{
+    pagination: {
+      limit: number,
+      full_count: number,
+      page: number
+    }
   }>();
 
-  // Generate the visible page numbers with ellipsis
-  function getPages() {
-    const pages = [];
-    const delta = 2; // Number of pages to show around the current one
-
-    if (totalPages <= 7) {
-      // Show all pages if count is small
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
+  const totalPages = $derived(Math.ceil(pagination.full_count/pagination.limit + pagination.limit))
+  const changePage = (n:number) => {
+    const newParams = new URLSearchParams(page.url.searchParams);
+    if (n) {
+      newParams.set('page', String(n));
     } else {
-      // Always include first and last
-      pages.push(1);
-      let start = Math.max(2, currentPage - delta);
-      let end = Math.min(totalPages - 1, currentPage + delta);
-
-      if (start > 2) pages.push("...");
-      for (let i = start; i <= end; i++) pages.push(i);
-      if (end < totalPages - 1) pages.push("...");
-      pages.push(totalPages);
+      newParams.delete('page');
     }
+    console.log(newParams.toString())
 
-    return pages;
-  }
-
-  function gotoPage(page: any) {
-    if (page !== "..." && page !== currentPage) {
-      onPageChange(page);
-    }
+    // 3. Navigate to the current path with the updated string
+    goto(`?${newParams.toString()}`, { 
+      // keepFocus: false, 
+      // replaceState: true,
+      // noScroll: true 
+    });
   }
 </script>
+<div class="flex gap-2 items-center">
+    <button class="bg-white shadow p-2 cursor-pointer disabled:bg-gray-100" onclick={() => changePage(pagination.page - 1)} disabled={pagination.page < 2}>Previous</button>
+    Page {pagination.page}/{totalPages}
+    <button class="bg-white shadow p-2 cursor-pointer disabled:bg-gray-100" onclick={() => changePage(pagination.page + 1)} disabled={pagination.page === Math.ceil(pagination.full_count/pagination.limit)}>Next</button>
+</div>
 
-<nav class="flex gap-2">
-  <button
-    class="border-1 border-gray-400 p-1 hover:cursor-pointer"
-    disabled={currentPage === 1}
-    onclick={() => gotoPage(currentPage - 1)}
-    ><Icon icon="solar:alt-arrow-left-linear" /></button
-  >
-
-  {#each getPages() as page}
-    {#if page === "..."}
-      <span class="ellipsis">...</span>
-    {:else}
-      <button
-        class={`border-1  border-gray-400 bg-gray-400 px-2 hover:cursor-pointer ${page === currentPage ? "bg-trust-b text-white" : "bg-white"}`}
-        onclick={() => gotoPage(page)}
-      >
-        {page}
-      </button>
-    {/if}
-  {/each}
-
-  <button
-    disabled={currentPage === totalPages}
-    class="border-1 border-gray-400 p-1 hover:cursor-pointer"
-    onclick={() => gotoPage(currentPage + 1)}
-    ><Icon icon="solar:alt-arrow-right-linear" /></button
-  >
-</nav>
-
-<style>
-  button.selected {
-    background: #007bff;
-    color: white;
-    border-color: #007bff;
-  }
-  button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  .ellipsis {
-    padding: 6px 12px;
-  }
-</style>

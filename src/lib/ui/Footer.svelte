@@ -1,12 +1,11 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
   import AuthButton from "./AuthButton.svelte";
-  import Link from "./Link.svelte";
 </script>
 
 <footer class="bg-white text-gray-900">
   <div
-    class="container  md:px-5 mx-auto py-10 flex flex-col md:flex-row gap-5 justify-between"
+    class="container md:px-5 mx-auto py-10 flex flex-col md:flex-row gap-5 justify-between"
   >
     <div class="flex flex-col text-sm grow items-center md:items-start">
       <span>
@@ -16,7 +15,6 @@
         >
       </span>
       <span>Charity Number: 1056362</span>
-      <Link href="/docs" text="Docs" />
     </div>
     <div class="flex items-center gap-3 mx-auto">
       <a href="https://www.facebook.com/thedartmoortrust">

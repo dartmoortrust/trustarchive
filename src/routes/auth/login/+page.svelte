@@ -4,7 +4,6 @@
   import Container from "$lib/ui/Container.svelte";
   import FormInput from "$lib/ui/FormInput.svelte";
   import Heading from "$lib/ui/Heading.svelte";
-  import { goto } from "$app/navigation";
   import Icon from "@iconify/svelte";
   let error = $state();
   // let { data, form }: { data: PageData; form: ActionData } = $props();

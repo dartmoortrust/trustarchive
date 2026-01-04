@@ -4,20 +4,21 @@
   import Image from "$lib/ui/Image.svelte";
   import Flex from "$lib/ui/Flex.svelte";
   import Grid from "$lib/ui/Grid.svelte";
-  import type { PageProps } from './$types';
-	let { data }: PageProps = $props();
+  import { getTrusteeById } from "../../../data.remote.js";
+  let { params } = $props();
+  const trustee = $derived(await getTrusteeById(params.id));
 </script>
 
 <Container py>
   <Grid cols={2}>
     <Flex>
-      <Heading text={data.trustee.name} />
-      <p class="">{data.trustee.detail}</p>
+      <Heading text={trustee.name} />
+      <p class="">{trustee.detail}</p>
     </Flex>
     <Flex>
       <Image
-        imagesrc={`https://dartmoor.blob.core.windows.net/assets/${data.trustee.image_url}`}
-        alt={data.trustee.name}
+        imagesrc={`https://dartmoor.blob.core.windows.net/assets/${trustee.image_url}`}
+        alt={trustee.name}
         grow
       />
     </Flex>

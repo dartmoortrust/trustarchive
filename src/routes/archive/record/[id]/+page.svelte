@@ -2,7 +2,6 @@
   import ArchiveImage from "$lib/ui/ArchiveImage.svelte";
   import Heading from "$lib/ui/Heading.svelte";
   import Map from "$lib/ui/Map.svelte";
-  import Seo from "$lib/ui/SEO.svelte";
   import DownloadButton from "$lib/ui/DownloadButton.svelte";
   import EditButton from "$lib/ui/EditButton.svelte";
   import Grid from "$lib/ui/Grid.svelte";

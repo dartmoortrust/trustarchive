@@ -9,7 +9,11 @@
   import Map from "$lib/ui/Map.svelte";
   import { toast } from "svelte-sonner";
   import { OSGB2latLng } from "$lib/os";
-  import { getRecord, updateRecord } from "../../../../data.remote";
+  import {
+    getRecord,
+    placeSearch,
+    updateRecord,
+  } from "../../../../data.remote";
   import { page } from "$app/state";
   import HelperBox from "$lib/ui/form/HelperBox.svelte";
 
@@ -31,8 +35,7 @@
   let { params } = $props();
 
   // Fetch and initialize data
-  const oldData = await getRecord(params.id);
-  const toasts = $state([])
+  const oldData = $derived(await getRecord(params.id));
   // Initialize record state with proper transform object
   let record = $state<Record>({
     ...oldData,
@@ -127,21 +130,12 @@
 
   const handlePlaceSearch = async (e: Event) => {
     e.preventDefault();
-
     if (!placename.trim()) {
       toast.error("Please enter a place name");
       return;
     }
-
     try {
-      const res = await fetch(
-        `/api/placesearch?q=${encodeURIComponent(placename)}`,
-      );
-      if (!res.ok) throw new Error("Search failed");
-      placeresults = await res.json();
-      if (placeresults.length === 0) {
-        toast.info("No place results found, try a different spelling.");
-      }
+      placeresults = await placeSearch(placename);
     } catch (error) {
       toast.error("Failed to search for place");
       placeresults = [];
@@ -158,8 +152,8 @@
   // Form submission
   const handleSubmit = async ({ form, data, submit }: any) => {
     try {
-      let resp = await submit()
-      console.log(form.result)
+      let resp = await submit();
+      console.log(form.result);
       toast.success("Successfully saved!");
     } catch (error) {
       console.error("Save error:", error);
@@ -172,7 +166,7 @@
   {#if page.data.session.roles?.includes("record-edit")}
     <!-- Main Form Section -->
     <div class="basis-2/3">
-      <form class="flex flex-col gap-4" {...updateRecord.enhance(handleSubmit)}>
+      <form class="flex flex-col gap-4" {...updateRecord}>
         <!-- Hidden fields -->
         <input type="hidden" {...updateRecord.fields.id.as("text")} />
         <input type="hidden" {...updateRecord.fields.transform.as("text")} />
@@ -317,8 +311,8 @@
               <input
                 bind:value={osgr}
                 onkeydown={(e) => {
-                  if(e.key === 'Enter'){
-                    handleOSGridSearch(e)
+                  if (e.key === "Enter") {
+                    handleOSGridSearch(e);
                   }
                 }}
                 type="text"
@@ -342,8 +336,8 @@
                 bind:value={placename}
                 type="text"
                 onkeydown={(e) => {
-                  if(e.key === 'Enter'){
-                    handlePlaceSearch(e)
+                  if (e.key === "Enter") {
+                    handlePlaceSearch(e);
                   }
                 }}
                 placeholder="Search for a place"

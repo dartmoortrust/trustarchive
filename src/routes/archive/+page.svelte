@@ -3,10 +3,7 @@
   import SearchForm from "$lib/ui/SearchForm.svelte";
   import Seo from "$lib/ui/SEO.svelte";
   import Flex from "$lib/ui/Flex.svelte";
-  import type { PageProps } from './$types';
-
-	let { data }: PageProps = $props();
-  // Centralize commonly used data
+  import { getCollections } from "../data.remote";
   const contactEmail = "secretary@dartmoortrust.org";
   const description = `Tens of thousands of images, video and audio from Dartmoor's past`;
 </script>
@@ -56,13 +53,13 @@
     </p>
     <Heading text="Our Collections" level={2} />
     <div class="flex flex-wrap gap-1">
-      {#each data.collections as { name, slug }}
+      {#each await getCollections() as { title, code }}
         <a
           class="bg-gray-50 px-2 py-1 transition hover:bg-gray-200"
-          href={`/archive/collection/${slug}`}
+          href={`/archive/collection/${code}`}
           data-sveltekit-preload-data="false"
         >
-          {name}
+          {title}
         </a>
       {/each}
     </div>

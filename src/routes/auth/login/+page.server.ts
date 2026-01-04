@@ -7,7 +7,6 @@ export const actions = {
       const data = await request.formData();
       const email = data.get("email");
       const password = data.get("password");
-
       if (!email && !password) {
         return fail(400, {
           error: "You must provide both an email address and password.",
@@ -24,6 +23,7 @@ export const actions = {
 
       return { success: true };
     } catch (error) {
+      console.error(error);
       return fail(400, { error: true, message: error.message });
     }
   },

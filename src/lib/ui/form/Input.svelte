@@ -2,21 +2,20 @@
 <script>
   import Label from "./Label.svelte";
 
-  let {
-    label = "",
-    maxLength = null,
-    issues = [],
-    ...others
-  } = $props();
+  let { label = "", maxLength = null, issues = [], ...others } = $props();
 
-  let length = $state()
+  let length = $state();
 </script>
 
 <div class="flex flex-col gap-2">
   {#if label}
     <Label name={others.name} {label} />
   {/if}
-  <input {...others} class="rounded-lg p-2 bg-white border-gray-200 border-2" bind:value={length} />
+  <input
+    {...others}
+    class="rounded-lg p-2 bg-white border-gray-200 border-2"
+    bind:value={length}
+  />
   {#if maxLength}
     <div class="text-right text-sm text-gray-500">
       {length?.length || 0} / {maxLength} characters

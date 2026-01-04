@@ -1,7 +1,5 @@
 <script>
-  import Container from "$lib/ui/Container.svelte";
   import Flex from "$lib/ui/Flex.svelte";
-  import Grid from "$lib/ui/Grid.svelte";
   import Heading from "$lib/ui/Heading.svelte";
   import Image from "$lib/ui/Image.svelte";
 </script>
@@ -14,7 +12,7 @@
     <Image
       imagesrc="PWT_project_logo.webp"
       alt="Phoebe"
-      width={400}
+      size={400}
       crop={false}
     />
     <p>

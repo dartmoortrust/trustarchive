@@ -4,7 +4,7 @@
   import Heading from "$lib/ui/Heading.svelte";
   import Image from "$lib/ui/Image.svelte";
   import Seo from "$lib/ui/SEO.svelte";
-    import { getTrustees } from "../data.remote";
+  import { getTrustees } from "../data.remote";
   const partners = [
     "Aune Head",
     "Bellever YHA",

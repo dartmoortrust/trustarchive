@@ -2,7 +2,14 @@
 <script>
   import Label from "./Label.svelte";
 
-  let { label, rows = 4, maxLength, resize = true, ...other } = $props();
+  let {
+    label,
+    rows = 4,
+    maxLength,
+    issues = [],
+    resize = true,
+    ...other
+  } = $props();
 </script>
 
 <div class="flex flex-col gap-2">
@@ -16,4 +23,9 @@
       ? 'resize-y'
       : 'resize-none'}"
   ></textarea>
+  {#each issues as issue}
+    <p class="issue border-l-2 border-red-800 bg-red-300 pl-4 py-2">
+      {issue.message}
+    </p>
+  {/each}
 </div>
