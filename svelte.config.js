@@ -1,6 +1,6 @@
 // svelte.config.js
 import adapter from 'svelte-adapter-bun';
-import { sveltePreprocess } from "svelte-preprocess";
+import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
   kit: {
@@ -9,14 +9,13 @@ const config = {
     },
     adapter: adapter({}),
   },
+
   compilerOptions: {
     experimental: {
       async: true,
     },
   },
-  preprocess: sveltePreprocess({
-    typescript: true,
-  }),
+  preprocess: vitePreprocess(),
 };
 
 export default config;
