@@ -12,6 +12,10 @@
 <Container>
   <div class="w-1/2 mx-auto flex flex-col gap-3">
     <Heading text="Login" />
+    <div class="p-3 border-2 border-gray-300 rounded bg-white text-gray-700">
+      Note: an account is not required to view or use the archive. This is for
+      the use of our volunteers.
+    </div>
     <form
       class="flex flex-col gap-3"
       method="POST"

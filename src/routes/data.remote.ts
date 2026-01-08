@@ -39,73 +39,85 @@ export const getCollectionById = query(z.string(), async (id: string) => {
   return collections[0];
 });
 
+// data.remote.ts
 export const searchRecords = query(
   z.object({
     q: z.string().trim().optional().default(""),
-    collection_id: z.uuid().optional(),
+    collection_id: z.string().uuid().optional(), // Ensure uuid validation
     limit: z.number().positive().default(25),
-    page: z.number().positive().optional().default(1),
+    page: z.number().positive().default(1),
   }),
   async (query) => {
-    console.log(query);
-    const { limit = 25, q, collection_id, page = 1 } = query;
-    const offset = limit * page - limit;
+    const { limit, q, collection_id, page } = query;
+
+    // Calculate offset: Page 1 = 0, Page 2 = 25, etc.
+    const offset = (page - 1) * limit;
+
     const parsedQuery = parseSearchQuery(q); // For tsquery
     const trigramQuery = cleanTrigramQuery(q); // For similarity operators
+
     const collectionFilter = sql`AND collection_id = ${collection_id}`;
     const textFilter = sql`
-      AND ts @@ to_tsquery('english', ${parsedQuery})    -- FTS Match
+      AND (
+        ts @@ to_tsquery('english', ${parsedQuery})    -- FTS Match
         OR title % ${trigramQuery}                     -- Trigram Match (title)
         OR detail % ${trigramQuery}                    -- Trigram Match (detail)
         OR caption_front % ${trigramQuery}             -- Trigram Match (caption)
+      )
     `;
 
-    const records = await sql`WITH search_results AS (
+    const records = await sql`
+      WITH search_results AS (
+        SELECT 
+          id, 
+          title, 
+          detail, 
+          caption_front, 
+          mime_type, 
+          sha1_hash, 
+          transform,
+          -- Full Text Search Rank
+          ts_rank_cd(ts, to_tsquery('english', ${parsedQuery}), 32) as exact_rank,
+          
+          -- Trigram Similarity Score (Combined and Weighted)
+          (
+            similarity(COALESCE(title, ''), ${trigramQuery}) * 3 +
+            similarity(COALESCE(detail, ''), ${trigramQuery}) * 2 +
+            similarity(COALESCE(caption_front, ''), ${trigramQuery}) * 1.5
+          ) / 6.5 as combined_similarity,
+          
+          -- Boolean check for an exact FTS match (boost results that matched FTS)
+          CASE 
+            WHEN ts @@ to_tsquery('english', ${parsedQuery}) THEN 1
+            ELSE 0
+          END as has_exact_match
+        FROM files
+        WHERE 
+          public = true
+          ${q ? textFilter : sql``}
+          ${collection_id ? collectionFilter : sql``}
+      )
       SELECT 
-        id, 
-        title, 
-        detail, 
-        caption_front, 
-        mime_type, 
-        sha1_hash, 
-        transform,
-        -- Full Text Search Rank
-        ts_rank_cd(ts, to_tsquery('english', ${parsedQuery}), 32) as exact_rank,
-        
-        -- Trigram Similarity Score (Combined and Weighted)
-        (
-          similarity(COALESCE(title, ''), ${trigramQuery}) * 3 +
-          similarity(COALESCE(detail, ''), ${trigramQuery}) * 2 +
-          similarity(COALESCE(caption_front, ''), ${trigramQuery}) * 1.5
-        ) / 6.5 as combined_similarity,
-        
-        -- Boolean check for an exact FTS match (boost results that matched FTS)
-        CASE 
-          WHEN ts @@ to_tsquery('english', $1) THEN 1
-          ELSE 0
-        END as has_exact_match
-      FROM files
-      WHERE 
-        public = true
-        -- Only include rows that have at least one match method
-        ${q ? textFilter : sql``}
-        ${collection_id ? collectionFilter : sql``}
-    )
-    SELECT 
-      sr.*,
-      count(*) OVER()::int AS full_count,
-      (exact_rank * 2 + combined_similarity * 1.5 + has_exact_match * 3) as rank
-    FROM search_results sr
-    ORDER BY rank DESC
-    OFFSET ${offset}
-    LIMIT ${limit}`;
+        sr.*,
+        count(*) OVER()::int AS full_count,
+        (exact_rank * 2 + combined_similarity * 1.5 + has_exact_match * 3) as rank
+      FROM search_results sr
+      ORDER BY rank DESC
+      LIMIT ${limit}
+      OFFSET ${offset}
+    `;
+
+    // Handle empty state gracefully
+    const fullCount = records[0]?.full_count ?? 0;
+
     return {
       records,
       pagination: {
         q,
         page,
         limit,
-        full_count: records[0] ? records[0].full_count : 0,
+        full_count: fullCount,
+        total_pages: Math.ceil(fullCount / limit),
       },
     };
   },

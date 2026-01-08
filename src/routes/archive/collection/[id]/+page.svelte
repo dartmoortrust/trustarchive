@@ -10,85 +10,85 @@
 
   let { params } = $props();
 
-  // 1. Move URL params into $derived so they update on navigation
+  // Reactive URL parameters
   const currentPage = $derived(Number(page.url.searchParams.get("page")) || 1);
   const currentLimit = $derived(
     Number(page.url.searchParams.get("limit")) || 25,
   );
 
-  // 2. Derive the collection based on the route params
-  const collection = $derived.by(async () => {
-    return await getCollectionById(params.id);
-  });
+  // New Svelte 5 Async Deriveds
+  // These will re-run automatically when params.id, currentPage, or currentLimit change
+  const collection = $derived(await getCollectionById(params.id));
 
-  // 3. Derive search results based on both the collection and the URL params
-  // We use $derived.by for cleaner async handling with multiple dependencies
-  const searchData = $derived.by(async () => {
-    // We must await the collection first since searchRecords needs its ID
-    const col = await collection;
-    return await searchRecords({
-      q: "",
-      collection_id: col.id,
-      page: currentPage,
-      limit: currentLimit,
-    });
-  });
+  const searchData = $derived(
+    collection
+      ? await searchRecords({
+          q: "",
+          collection_id: collection.id,
+          page: currentPage,
+          limit: currentLimit,
+        })
+      : null,
+  );
 
-  // 4. Helper derivations for cleaner template access
-  const records = $derived.by(() => {
-    // Use optional chaining or provide defaults to handle the async pending state
-    return searchData?.then((res) => res.records) || [];
-  });
+  // Destructure for cleaner template use
+  const records = $derived(searchData?.records ?? []);
+  const pagination = $derived(searchData?.pagination);
 </script>
 
-{#await collection then col}
+{#if collection}
   <Seo
-    title={`The ${col.title} Collection from the Dartmoor Trust Archive`}
-    description={`The ${col.title} Collection from the Dartmoor Trust Archive`}
+    title={`The ${collection.title} Collection from the Dartmoor Trust Archive`}
+    description={`The ${collection.title} Collection from the Dartmoor Trust Archive`}
   />
 
   <Container>
     <div class="flex flex-cols gap-5">
       <div class="basis-1/3">
-        <Heading text={col.title + " Collection"} />
+        <Heading text={collection.title + " Collection"} />
+
         <div class="flex-rows gap-4 text-gray-800 space-y-3">
-          {#if col.description}
+          {#if collection.description}
             <div class="flex flex-col gap-3">
-              {@html col.description}
+              {@html collection.description}
             </div>
           {/if}
-          {#if col.copyright}
+
+          {#if collection.copyright}
             <span class="flex gap-3">
               <Icon icon="solar:copyright-outline" width="24" height="24" />
-              <a href={col.copyright_url}>
-                {col.copyright}
+              <a href={collection.copyright_url}>
+                {collection.copyright}
               </a>
             </span>
           {/if}
         </div>
 
-        {#await searchData then data}
-          <div class="flex flex-col gap-3">
-            <div class="flex gap-3">
-              <Icon
-                icon="solar:layers-minimalistic-outline"
-                width="24"
-                height="24"
-              />
-              {data.pagination?.full_count + " results" || "No results"}
-            </div>
-            <Pagination pagination={data.pagination} />
+        <div class="flex flex-col gap-3">
+          <div class="flex gap-3">
+            <Icon
+              icon="solar:layers-minimalistic-outline"
+              width="24"
+              height="24"
+            />
+            {pagination?.full_count
+              ? `${pagination.full_count} results`
+              : "Loading..."}
           </div>
-        {/await}
+
+          {#if pagination}
+            <Pagination {pagination} />
+          {/if}
+        </div>
       </div>
 
       <div class="basis-2/3">
-        {#await searchData}
+        {#if records.length > 0}
+          <RecordGrid {records} />
+        {:else}
           <p>Loading records...</p>
-        {:then data}
-          <RecordGrid records={data.records} />
-        {/await}
+        {/if}
       </div>
     </div>
   </Container>
-{/await}
+{/if}
