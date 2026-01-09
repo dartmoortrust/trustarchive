@@ -53,13 +53,17 @@
 
   onMount(async () => {
     // Fetch Transcript
-    const transcriptRes = await fetch("/test/dat02.vtt");
+    const transcriptRes = await fetch(
+      "https://dartmoor.blob.core.windows.net/assets/dat02.vtt",
+    );
     const transcriptText = await transcriptRes.text();
     allCues = parseVtt(transcriptText);
 
     // Fetch Chapters
     try {
-      const chaptersRes = await fetch("/test/dat02chapters.vtt");
+      const chaptersRes = await fetch(
+        "https://dartmoor.blob.core.windows.net/assets/dat02chapters.vtt",
+      );
       const chaptersText = await chaptersRes.text();
       chapters = parseVtt(chaptersText);
     } catch (e) {
@@ -119,7 +123,7 @@
       </div>
       <audio
         bind:this={audioTag}
-        src="/test/dat02.mp3"
+        src="https://dartmoor.blob.core.windows.net/assets/dat02.mp3"
         bind:currentTime
         controls
         class="w-full"
