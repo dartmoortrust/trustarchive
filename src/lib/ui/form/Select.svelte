@@ -1,7 +1,13 @@
 <!-- DateSelect.svelte -->
 <script>
   import Label from "./Label.svelte";
-  let { label = "", placeholder = "", items, ...others } = $props();
+  let {
+    // value = $bindable(),
+    label = "",
+    placeholder = "",
+    items,
+    ...others
+  } = $props();
 </script>
 
 <div class="flex flex-col gap-2">

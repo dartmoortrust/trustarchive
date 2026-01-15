@@ -51,7 +51,7 @@
   updateRecord.fields.set(oldData);
 
   $effect(() => {
-    updateRecord.fields.transform.set(JSON.stringify(record.transform));
+    updateRecord.fields.transform.set(record.transform);
   });
   $effect(() => {
     updateRecord.fields.location_geom.set(JSON.stringify(record.geom));
