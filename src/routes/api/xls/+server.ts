@@ -7,58 +7,97 @@ export const POST: RequestHandler = async ({ request }) => {
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File;
-    // const collectionId = formData.get("collectionId") as String;
-    if (!collectionId) {
-      return json({ error: "No Collection ID Provided" });
-    }
-    if (!file) {
-      return json({ error: "No file uploaded" }, { status: 400 });
+    const collectionId = formData.get("collectionId"); // Get the constraint
+
+    if (!file || !collectionId) {
+      return json({ error: "Missing file or collectionId" }, { status: 400 });
     }
 
-    // 1. Convert File to ArrayBuffer
     const arrayBuffer = await file.arrayBuffer();
-
-    // 2. Read the buffer using SheetJS
     const workbook = XLSX.read(arrayBuffer);
+    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+    const jsonData = XLSX.utils.sheet_to_json(worksheet) as any[];
 
-    // 3. Select a sheet (e.g., the first one)
-    const firstSheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[firstSheetName];
-    // 4. Convert sheet data to a clean JSON array
-    const jsonData = XLSX.utils.sheet_to_json(worksheet);
-
-    // Log or process your data here
-    for (const row of jsonData) {
-      try {
-        // 2. Use parameters ($1, $2) to prevent SQL Injection
-        // Note: Syntax varies slightly by SQL driver (e.g., postgres.js uses ${})
-        const results = await sql`
-      SELECT id 
-      FROM files 
-      WHERE file_path LIKE ${"%" + row?.id + "%"} 
-      LIMIT 1
+    // 1. Column Validation Setup
+    const columnCheck = await sql`
+      SELECT column_name 
+      FROM information_schema.columns 
+      WHERE table_name = 'files'
     `;
+    const validDbColumns = new Set(columnCheck.map((c) => c.column_name));
 
-        // 3. Handle the result (results is usually an array)
-        const dbrow = results[0];
+    const resultsSummary = [];
 
-        if (dbrow) {
-          console.log(`Row found: ${row.id} - ${dbrow.id}`);
-          await sql`UPDATE files set `;
-        } else {
-          console.log(`No match for: ${row.id}`);
+    // 2. Process within a Transaction
+    await sql.begin(async (tx) => {
+      for (const row of jsonData) {
+        let status = "Success";
+        let errorMessage = "";
+
+        try {
+          // Constrain search by both file_name AND collection_id
+          const [dbrow] = await tx`
+            SELECT id FROM files 
+            WHERE file_path ILIKE ${"%" + (row.file_name || "") + "%"} 
+            AND collection_id = ${collectionId}
+            LIMIT 1
+          `;
+
+          if (dbrow) {
+            const payload: Record<string, any> = {};
+            for (const [key, value] of Object.entries(row)) {
+              const dbKey = key.toLowerCase().trim().replace(/\s+/g, "_");
+
+              // Ensure we don't accidentally overwrite system columns
+              if (
+                dbKey !== "file_name" &&
+                dbKey !== "collection_id" &&
+                validDbColumns.has(dbKey)
+              ) {
+                payload[dbKey] = value;
+              }
+            }
+
+            const columns = Object.keys(payload);
+            if (columns.length > 0) {
+              await tx`UPDATE files SET ${tx(payload, ...columns)} WHERE id = ${dbrow.id}`;
+            }
+          } else {
+            status = "Error";
+            errorMessage = `No match for "${row.file_name}" in collection ${collectionId}`;
+          }
+        } catch (e: any) {
+          status = "Error";
+          errorMessage = e.message;
         }
-      } catch (e) {
-        console.error(`Error processing row ${row.id}:`, e);
-      }
-    }
 
-    return json({
-      message: "File processed successfully",
-      data: jsonData,
+        resultsSummary.push({
+          ...row,
+          import_status: status,
+          import_error: errorMessage,
+        });
+      }
+    });
+
+    // 3. Generate Report
+    const reportSheet = XLSX.utils.json_to_sheet(resultsSummary);
+    const reportWorkbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(reportWorkbook, reportSheet, "Import Report");
+
+    const reportBuffer = XLSX.write(reportWorkbook, {
+      type: "buffer",
+      bookType: "xlsx",
+    });
+
+    return new Response(reportBuffer, {
+      headers: {
+        "Content-Type":
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "Content-Disposition": 'attachment; filename="import_report.xlsx"',
+      },
     });
   } catch (error) {
-    console.error("Error processing Excel:", error);
-    return json({ error: "Failed to process the Excel file" }, { status: 500 });
+    console.error(error);
+    return json({ error: "Critical process failure" }, { status: 500 });
   }
 };

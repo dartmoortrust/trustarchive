@@ -11,7 +11,9 @@ export const recordSchema = z.object({
   detail: z
     .string()
     .max(5000)
-    .min(20, { error: "Details should be more than 20 characters long" })
+    .refine((val) => val === "" || val.length >= 50, {
+      message: "Details should be either empty or at least 50 characters long",
+    })
     .transform((val) => (val === "" ? null : val)),
   caption_front: z.string().transform((val) => (val === "" ? null : val)),
   caption_back: z.string().transform((val) => (val === "" ? null : val)),
@@ -19,9 +21,21 @@ export const recordSchema = z.object({
     .string()
     .optional()
     .transform((val) => (val === "" ? null : val)),
-  date_day: z.string().transform((val) => (val === "" ? null : Number(val))),
-  date_month: z.string().transform((val) => (val === "" ? null : Number(val))),
-  date_year: z.string().transform((val) => (val === "" ? null : Number(val))),
+  date_day: z.preprocess((val) => {
+    if (val === "" || val === null || val === undefined) return null;
+    const num = typeof val === "string" ? Number(val) : val;
+    return isNaN(num) ? null : num;
+  }, z.number().int().min(1).max(31).nullable()),
+  date_month: z.preprocess((val) => {
+    if (val === "" || val === null || val === undefined) return null;
+    const num = typeof val === "string" ? Number(val) : val;
+    return isNaN(num) ? null : num;
+  }, z.number().int().min(1).max(12).nullable()),
+  date_year: z.preprocess((val) => {
+    if (val === "" || val === null || val === undefined) return null;
+    const num = typeof val === "string" ? Number(val) : val;
+    return isNaN(num) ? null : num;
+  }, z.number().int().min(1900).max(new Date().getFullYear()).nullable()),
   date_estimated: z.boolean().default(false),
   transform: z.string(),
   location_geom: z

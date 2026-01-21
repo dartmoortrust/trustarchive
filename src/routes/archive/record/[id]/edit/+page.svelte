@@ -65,21 +65,30 @@
   );
 
   // Dropdown options
-  const days = Array.from({ length: 31 }, (_, i) => ({
-    value: i + 1,
-    label: String(i + 1),
-  }));
+  const days = [
+    { value: "", label: "Unknown" },
+    ...Array.from({ length: 31 }, (_, i) => ({
+      value: String(i + 1),
+      label: String(i + 1),
+    })),
+  ];
 
-  const months = Array.from({ length: 12 }, (_, i) => ({
-    value: i + 1,
-    label: String(i + 1),
-  }));
+  const months = [
+    { value: "", label: "Unknown" },
+    ...Array.from({ length: 12 }, (_, i) => ({
+      value: String(i + 1),
+      label: String(i + 1),
+    })),
+  ];
 
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => ({
-    value: 1900 + i,
-    label: String(1900 + i),
-  })).reverse(); // Most recent years first
+  const years = [
+    { value: "", label: "Unknown" },
+    ...Array.from({ length: currentYear - 1900 + 1 }, (_, i) => ({
+      value: String(1900 + i),
+      label: String(1900 + i),
+    })).reverse(),
+  ];
 
   // Transform manipulation functions
   const rotate = (degrees: number) => {
@@ -243,21 +252,38 @@
         <hr class="my-2" />
 
         <!-- Date Fields -->
+        <!-- Date Fields -->
+        <!-- Date Fields -->
         <div class="flex gap-4 items-end">
           <Select
             label="Day"
             items={days}
-            {...updateRecord.fields.date_day.as("select")}
+            value={record.date_day?.toString() || ""}
+            onchange={(e) => {
+              const val = e.target.value;
+              record.date_day = val ? parseInt(val) : null;
+              updateRecord.fields.date_day.set(val);
+            }}
           />
           <Select
             label="Month"
             items={months}
-            {...updateRecord.fields.date_month.as("select")}
+            value={record.date_month?.toString() || ""}
+            onchange={(e) => {
+              const val = e.target.value;
+              record.date_month = val ? parseInt(val) : null;
+              updateRecord.fields.date_month.set(val);
+            }}
           />
           <Select
             label="Year"
             items={years}
-            {...updateRecord.fields.date_year.as("select")}
+            value={record.date_year?.toString() || ""}
+            onchange={(e) => {
+              const val = e.target.value;
+              record.date_year = val ? parseInt(val) : null;
+              updateRecord.fields.date_year.set(val);
+            }}
           />
           <Checkbox
             label="Circa"
