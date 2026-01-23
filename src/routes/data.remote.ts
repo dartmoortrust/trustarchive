@@ -171,7 +171,7 @@ export const updateRecord = form(recordSchema, async (recordData) => {
   try {
     // Build GeoJSON only if coordinates exist
     let locationGeom = JSON.parse(recordData?.location_geom || "");
-    console.log(locationGeom);
+    console.log(recordData);
     let locationConditional = sql`ST_SetSRID(ST_MakePoint(${locationGeom[0]}::float8, ${locationGeom[1]}::float8), 4326)`;
     // if (recordData.location_geom) {
     //   const parsedGeom = JSON.parse(recordData.location_geom);
@@ -179,10 +179,10 @@ export const updateRecord = form(recordSchema, async (recordData) => {
     // }
     let updatedBy = locals.session.email || "nobody";
     await sql.begin(async (tx) => {
-      await tx`
-        INSERT INTO edit_history(record_id, updated_by, record)
-        VALUES (${recordData.id}, ${updatedBy}, ${recordData})
-      `;
+      // await tx`
+      //   INSERT INTO edit_history(record_id, updated_by, record)
+      //   VALUES (${recordData.id}, ${updatedBy}, ${recordData})
+      // `;
       await tx`
         UPDATE files
         SET
