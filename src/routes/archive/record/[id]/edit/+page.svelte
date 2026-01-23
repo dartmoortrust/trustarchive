@@ -145,6 +145,9 @@
     }
     try {
       placeresults = await placeSearch(placename);
+      if (placeresults.length === 0) {
+        toast.info("No places found - please try another spelling.");
+      }
     } catch (error) {
       toast.error("Failed to search for place");
       placeresults = [];
@@ -158,17 +161,7 @@
     toast.success("Location updated");
   };
 
-  // Form submission
-  const handleSubmit = async ({ form, data, submit }: any) => {
-    try {
-      let resp = await submit();
-      console.log(form.result);
-      toast.success("Successfully saved!");
-    } catch (error) {
-      console.error("Save error:", error);
-      toast.error("Failed to save changes");
-    }
-  };
+
 </script>
 
 <div class="container mx-auto flex flex-row gap-10 p-4">
@@ -415,13 +408,16 @@
 
     <!-- Preview Section -->
     <div class="basis-1/3">
+      {#if updateRecord.result?.success}
+        <p class="p-3 bg-green-800 text-white mb-5 text-center font-bold">Successfully saved!</p>
+      {/if}
       <div class="sticky top-5 flex flex-col gap-4">
         <!-- Transform Controls -->
 
         <!-- Image Preview -->
         <div class="bg-white p-4 rounded border">
           <h3 class="font-semibold mb-3">Preview</h3>
-          <ArchiveImage {record} size={500} crop={false} />
+          <ArchiveImage {record} size={500} crop={false} lightbox={true} />
         </div>
         <div class="bg-white p-4 rounded border">
           <h3 class="font-semibold mb-3">Image Transforms</h3>
