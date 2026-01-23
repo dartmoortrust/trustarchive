@@ -44,7 +44,7 @@
     }}
   />
   <div class="md:hidden">
-    <ArchiveImage {record} size={300} crop={true} />
+    <ArchiveImage {record} size={300} crop={true} lightbox={false} />
   </div>
   <Container>
     <Flex>
@@ -102,7 +102,7 @@
             <VideoPlayer {record} />
           {:else}
             <MobileHidden>
-              <ArchiveImage {record} size={500} crop={false} />
+              <ArchiveImage {record} size={500} crop={false} lightbox={true}  />
             </MobileHidden>
           {/if}
           <Map geojson={record.geom} estimated={record.location_estimated} />

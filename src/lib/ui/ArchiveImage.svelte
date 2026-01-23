@@ -6,11 +6,15 @@
     record,
     size = 200,
     crop = false,
-  }: { record: any; size: number; crop: boolean } = $props();
+    lightbox = false
+  }: { record: any; size: number; crop: boolean, lightbox:boolean } = $props();
   let src = $derived(getRecordImageWebUrl(record, size, crop));
   let lightboxSrc = $derived(getRecordImageWebUrl(record, 1500, false));
   const toggleLightbox = () => {
+    if(lightbox){
     isOpen = !isOpen;
+
+    }
   };
   function handleKeydown(e: any) {
     if (e.key === "Escape" && isOpen) {
