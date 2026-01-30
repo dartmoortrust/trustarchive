@@ -36,7 +36,7 @@ export const recordSchema = v.object({
   ),
 
   transform: v.object({
-    r: v.number(),
+    r: v.optional(v.number(), 0),
     flip: v.optional(v.boolean(), false),
     flop: v.optional(v.boolean(), false),
     n: v.optional(v.boolean(), false),

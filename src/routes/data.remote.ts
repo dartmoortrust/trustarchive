@@ -2,15 +2,15 @@ import { form, getRequestEvent, query } from "$app/server";
 import { recordSchema } from "$lib/schema";
 import { SQL } from "bun";
 import { error } from "@sveltejs/kit";
-import z, { record } from "zod";
 import { getSignedUrl } from "$lib/server/files";
 import { cleanTrigramQuery, parseSearchQuery } from "$lib/tools";
 import { DATABASE_URL } from "$env/static/private";
+import * as v from 'valibot';
 
 const sql = new SQL({
   // Connection details (adapter is auto-detected as PostgreSQL)
   url: DATABASE_URL,
-  max: 10, // Maximum connections in pool
+  max: 5, // Maximum connections in pool
   idleTimeout: 30, // Close idle connections after 30s
   maxLifetime: 0, // Connection lifetime in seconds (0 = forever)
   connectionTimeout: 30, // Timeout when establishing new connections
@@ -32,7 +32,7 @@ export const getTrustees = query(async () => {
   return rows;
 });
 
-export const getTrusteeById = query(z.string(), async (id: string) => {
+export const getTrusteeById = query(v.string(), async (id: string) => {
   const rows =
     await sql`select * from trustees where retired = false and slug = ${id}`;
 
@@ -43,7 +43,7 @@ export const getCollections = query(async () => {
   return await sql`SELECT id,code, title from fonds order by title`;
 });
 
-export const placeSearch = query(z.string(), async (name: string) => {
+export const placeSearch = query(v.string(), async (name: string) => {
   let places = await sql`
       SELECT name1, ST_GeoHash(geom, 9) as geohash
       FROM devonplaces
@@ -52,18 +52,18 @@ export const placeSearch = query(z.string(), async (name: string) => {
   return places;
 });
 
-export const getCollectionById = query(z.string(), async (id: string) => {
+export const getCollectionById = query(v.string(), async (id: string) => {
   const collections = await sql`SELECT * from fonds where code = ${id}`;
   return collections[0];
 });
 
 // data.remote.ts
 export const searchRecords = query(
-  z.object({
-    q: z.string().trim().optional().default(""),
-    collection_id: z.string().uuid().optional(), // Ensure uuid validation
-    limit: z.number().positive().default(25),
-    page: z.number().positive().default(1),
+  v.object({
+    q: v.string(),
+    collection_id: v.optional(v.string()), // Ensure uuid validation
+    limit: v.number(),
+    page: v.number(),
   }),
   async (query) => {
     const { limit, q, collection_id, page } = query;
@@ -142,10 +142,10 @@ export const searchRecords = query(
 );
 
 export const getRecordsByCollectionId = query(
-  z.object({
-    id: z.uuid(),
-    limit: z.number(),
-    page: z.number(),
+  v.object({
+    id: v.string(),
+    limit: v.number(),
+    page: v.number(),
   }),
   async (query) => {
     const { limit, page = 4, id } = query;
@@ -162,7 +162,7 @@ export const getRecordsByCollectionId = query(
   },
 );
 
-export const getRecord = query(z.uuid(), async (id) => {
+export const getRecord = query(v.string(), async (id) => {
   try {
     let records = await sql`
             SELECT 
@@ -240,7 +240,7 @@ export const updateRecord = form(recordSchema, async (recordData) => {
   }
 });
 
-export const getDownloadUrl = query(z.uuid(), async (recordId) => {
+export const getDownloadUrl = query(v.string(), async (recordId) => {
   //checkuser
   const { locals } = getRequestEvent();
 

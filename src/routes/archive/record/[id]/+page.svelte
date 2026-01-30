@@ -106,10 +106,7 @@
               <ArchiveImage {record} size={500} crop={false} lightbox={true} />
             </MobileHidden>
           {/if}
-          <Map
-            bind:geohash={record.geohash}
-            estimated={record.location_estimated}
-          />
+          <Map geohash={record.geohash} estimated={record.location_estimated} />
         </Flex>
       </Grid>
     </Flex>
