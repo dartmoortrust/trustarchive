@@ -1,38 +1,26 @@
 <script>
-  import { env } from "$env/static/public";
-  import maplibregl from "maplibre-gl";
-  import "maplibre-gl/dist/maplibre-gl.css";
-  import { onDestroy, onMount } from "svelte";
-  let mapstate = $state();
-  let mapContainer;
-  let lng, lat;
-
-  lng = -4;
-  lat = 50;
-  let zoom = $state(9);
-
-  let initialState = { lng, lat, zoom };
-  onMount(() => {
-    let map = new maplibregl.Map({
-      container: "map",
-      // accessToken: "YOUR_MAPBOX_ACCESS_TOKEN",
-      center: [initialState.lng, initialState.lat],
-      zoom,
-      style:
-        "https://api.os.uk/maps/vector/v1/vts/resources/styles?srs=3857&key=" +
-        env.PUBLIC_OS_KEY,
-      maxBounds: [
-        [-10.76418, 49.528423],
-        [1.9134116, 61.331151],
-      ],
-    });
-    map.on("moveend", (e) => (mapstate = e.target));
-  });
-
-  // onDestroy(() => {
-  //   map.des();
-  // });
+  import { env } from "$env/dynamic/public";
+  import { geohashToLatLng, latLngToGeohash } from "../tools";
+  import { DefaultMarker, MapLibre } from "svelte-maplibre";
+  import MarkerInfo from "./MarkerInfo.svelte";
+  let { updateRecord } = $props();
+  let coords = $derived(geohashToLatLng(updateRecord.fields.geohash.value()));
+  $inspect(coords);
 </script>
 
-<div id="map" class="map h-96 w-full" bind:this={map}></div>
-{mapstate}
+<MapLibre
+  center={coords ? [coords.lng, coords.lat] : [-3.65, 50.65]}
+  zoom={coords ? 15 : 8}
+  class="w-full relative h-[30rem] z-0"
+  style={`https://api.os.uk/maps/vector/v1/vts/resources/styles?srs=3857&key=${env.PUBLIC_OS_KEY}`}
+  onclick={(e) => {
+    console.log(e.lngLat);
+    let geohash = latLngToGeohash(e.lngLat.lat, e.lngLat.lng);
+    updateRecord.fields.geohash.set(geohash);
+  }}
+>
+  {#if coords}
+    <MarkerInfo lat={coords.lat} lng={coords.lng} />
+    <DefaultMarker lngLat={[coords.lng, coords.lat]} />
+  {/if}
+</MapLibre>

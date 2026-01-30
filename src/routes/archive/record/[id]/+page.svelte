@@ -20,7 +20,6 @@
   const record = $derived(await getRecord(params.id));
 </script>
 
-
 {#if record.public === false}
   <div>This record is not public</div>
 {:else}
@@ -40,7 +39,9 @@
       description:
         record.detail ||
         "Historical information from a record depicting life and times on Dartmoor",
-      image: record.mime_type.startsWith('image') ? getRecordImageWebUrl(record, 500, false) : null,
+      image: record.mime_type.startsWith("image")
+        ? getRecordImageWebUrl(record, 500, false)
+        : null,
     }}
   />
   <div class="md:hidden">
@@ -60,33 +61,33 @@
               />
             </div>
             {#if record.date_day || record.date_month || record.date_month}
-            <div class="flex items-center gap-2">
-              <Icon icon="solar:calendar-broken" />Date: {`${record.date_day || "?"}/${record.date_month || "?"}/${record.date_year || "?"} ${record.date_estimated ? "(circa)" : ""}`}
-            </div>
+              <div class="flex items-center gap-2">
+                <Icon icon="solar:calendar-broken" />Date: {`${record.date_day || "?"}/${record.date_month || "?"}/${record.date_year || "?"} ${record.date_estimated ? "(circa)" : ""}`}
+              </div>
             {/if}
             {#if record.caption_front}
-            <div class="flex items-center gap-2">
-              <Icon icon="solar:pen-outline" />Caption (front): {record.caption_front ||
-                "?"}
-            </div>
+              <div class="flex items-center gap-2">
+                <Icon icon="solar:pen-outline" />Caption (front): {record.caption_front ||
+                  "?"}
+              </div>
             {/if}
             {#if record.caption_rear}
-            <div class="flex items-center gap-2">
-              <Icon icon="solar:pen-outline" />Caption (rear): {record.caption_rear ||
-                "?"}
-            </div>
+              <div class="flex items-center gap-2">
+                <Icon icon="solar:pen-outline" />Caption (rear): {record.caption_rear ||
+                  "?"}
+              </div>
             {/if}
             {#if record.location_name}
-            <div class="flex items-center gap-2">
-              <Icon icon="solar:point-on-map-bold-duotone" />Location Name: {record.location_name ||
-                "?"}
-            </div>
+              <div class="flex items-center gap-2">
+                <Icon icon="solar:point-on-map-bold-duotone" />Location Name: {record.location_name ||
+                  "?"}
+              </div>
             {/if}
             {#if record.original_id}
-            <div class="flex items-center gap-2">
-              <Icon icon="solar:layers-minimalistic-linear" />Original ID: {record.original_id ||
-                "?"}
-            </div>
+              <div class="flex items-center gap-2">
+                <Icon icon="solar:layers-minimalistic-linear" />Original ID: {record.original_id ||
+                  "?"}
+              </div>
             {/if}
           </div>
           <div class="flex gap-2">
@@ -102,10 +103,13 @@
             <VideoPlayer {record} />
           {:else}
             <MobileHidden>
-              <ArchiveImage {record} size={500} crop={false} lightbox={true}  />
+              <ArchiveImage {record} size={500} crop={false} lightbox={true} />
             </MobileHidden>
           {/if}
-          <Map geojson={record.geom} estimated={record.location_estimated} />
+          <Map
+            bind:geohash={record.geohash}
+            estimated={record.location_estimated}
+          />
         </Flex>
       </Grid>
     </Flex>

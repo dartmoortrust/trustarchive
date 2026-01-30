@@ -1,10 +1,29 @@
 import { form, getRequestEvent, query } from "$app/server";
 import { recordSchema } from "$lib/schema";
-import { sql } from "bun";
+import { SQL } from "bun";
 import { error } from "@sveltejs/kit";
-import z from "zod";
+import z, { record } from "zod";
 import { getSignedUrl } from "$lib/server/files";
 import { cleanTrigramQuery, parseSearchQuery } from "$lib/tools";
+import { DATABASE_URL } from "$env/static/private";
+
+const sql = new SQL({
+  // Connection details (adapter is auto-detected as PostgreSQL)
+  url: DATABASE_URL,
+  max: 10, // Maximum connections in pool
+  idleTimeout: 30, // Close idle connections after 30s
+  maxLifetime: 0, // Connection lifetime in seconds (0 = forever)
+  connectionTimeout: 30, // Timeout when establishing new connections
+ 
+  // Callbacks
+  onconnect: client => {
+    console.log("Connected to PostgreSQL");
+  },
+  onclose: client => {
+    console.log("PostgreSQL connection closed");
+  },
+});
+
 
 export const getTrustees = query(async () => {
   const rows =
@@ -26,11 +45,10 @@ export const getCollections = query(async () => {
 
 export const placeSearch = query(z.string(), async (name: string) => {
   let places = await sql`
-      SELECT name1, ST_asGeoJSON(geom)::json->'coordinates' as coords
+      SELECT name1, ST_GeoHash(geom, 9) as geohash
       FROM devonplaces
       WHERE name1 ilike ${`%` + name + `%`}
     `;
-  console.log(places);
   return places;
 });
 
@@ -147,11 +165,28 @@ export const getRecordsByCollectionId = query(
 export const getRecord = query(z.uuid(), async (id) => {
   try {
     let records = await sql`
-            SELECT r.id, r.title, r.transform, r.sha1_hash, r.date_day, r.date_month, r.date_year, r.downloadable,
-            r.caption_front, r.caption_back, r.location_name, r.location_estimated, r.original_id,
-            ARRAY[ST_X(location_geom), ST_Y(location_geom)] as geom, r.detail, r.mime_type,    
-            r.date_estimated, r.sha1_hash, r.mime_type, r.public, c.title as colname, c.code as colslug, c.id as colid,
-            r.transform
+            SELECT 
+              r.id,
+              r.title,
+              r.transform,
+              r.sha1_hash,
+              r.date_day::varchar,
+              r.date_month::varchar,
+              r.date_year::varchar,
+              r.downloadable,
+              r.caption_front,
+              r.caption_back,
+              r.location_name,
+              r.location_estimated,
+              r.original_id,
+              r.detail, 
+              r.mime_type,
+              r.date_estimated, 
+              r.public::bool, 
+              c.title as colname, 
+              c.code as colslug, 
+              c.id as colid,
+              ST_GeoHash(r.location_geom, 9) as geohash
             FROM files r
             JOIN fonds c on c.id = r.collection_id
             WHERE r.id = ${id}
@@ -167,16 +202,8 @@ export const updateRecord = form(recordSchema, async (recordData) => {
   if (!locals.session?.roles.includes("record-edit")) {
     return error(500, { message: "Not allowed" });
   }
-  console.log(locals.session);
+  console.log(recordData);
   try {
-    // Build GeoJSON only if coordinates exist
-    let locationGeom = JSON.parse(recordData?.location_geom || "");
-    console.log(recordData);
-    let locationConditional = sql`ST_SetSRID(ST_MakePoint(${locationGeom[0]}::float8, ${locationGeom[1]}::float8), 4326)`;
-    // if (recordData.location_geom) {
-    //   const parsedGeom = JSON.parse(recordData.location_geom);
-    //   locationGeom = [parsedGeom[0], parsedGeom[1]];
-    // }
     let updatedBy = locals.session.email || "nobody";
     await sql.begin(async (tx) => {
       // await tx`
@@ -194,20 +221,22 @@ export const updateRecord = form(recordSchema, async (recordData) => {
             date_month = ${recordData.date_month},
             date_year = ${recordData.date_year},
             date_estimated = ${recordData.date_estimated},
-            transform = ${recordData.transform},
-            location_geom = ${locationGeom !== "" ? locationConditional : sql``},
-            location_name = ${recordData.location_name},
-            location_estimated = ${recordData.location_estimated},
-            original_id = ${recordData.original_id}
+            original_id = ${recordData.original_id},
+            downloadable = ${recordData.downloadable},
+            location_geom = ST_GeomFromGeoHash(${recordData.geohash}),
+            public = ${recordData.public},
+            transform = ${recordData.transform}::json
         WHERE id = ${recordData.id}
         RETURNING id
       `;
     });
-    console.log("Saved");
+    // await getRecord(String(recordData?.id)).refresh();
+    console.log("Record Saved")
     return { success: true };
+
   } catch (e) {
     console.log(e);
-    return error(500, { message: "Failed to update record" });
+    return {success: false, message: "Failed to update record" };
   }
 });
 

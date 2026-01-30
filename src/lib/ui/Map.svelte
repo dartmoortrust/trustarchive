@@ -1,26 +1,32 @@
 <script lang="ts">
   import { env } from "$env/dynamic/public";
+  import { decodeBase32 } from "geohashing";
   import MarkerInfo from "./MarkerInfo.svelte";
   import { DefaultMarker, MapLibre } from "svelte-maplibre";
-  let { geojson = $bindable(), estimated = false, edit = false } = $props();
+
+  let { geohash, estimated = false } = $props();
+
+  let coords = $derived.by(() => {
+    if (!geohash) return null;
+    try {
+      return decodeBase32(geohash);
+    } catch (e) {
+      console.error("Invalid geohash:", geohash);
+      return null;
+    }
+  });
 </script>
 
-{#if geojson[0] !== null || edit}
+{#if geohash}
   <MapLibre
-    center={geojson[0] !== null ? geojson : [-3.75, 50.6]}
-    zoom={geojson[0] !== null ? 15 : 9}
-    class="w-full relative h-[30rem] z-0 "
+    center={coords ? [coords.lng, coords.lat] : [-3.65, 50.65]}
+    zoom={coords ? 15 : 8}
+    class="w-full relative h-[30rem] z-0"
     style={`https://api.os.uk/maps/vector/v1/vts/resources/styles?srs=3857&key=${env.PUBLIC_OS_KEY}`}
-    onclick={(e) => (geojson = [e.lngLat.lng, e.lngLat.lat])}
   >
-    {#if geojson[0] !== null}
-      <MarkerInfo lat={geojson[0]} lng={geojson[1]} {estimated} />
-      <DefaultMarker
-        lngLat={geojson}
-        draggable={edit}
-        ondragend={(e) =>
-          (geojson = [e.marker._lngLat.lng, e.marker._lngLat.lat])}
-      />
+    {#if coords}
+      <MarkerInfo lat={coords.lat} lng={coords.lng} {estimated} />
+      <DefaultMarker lngLat={[coords.lng, coords.lat]} />
     {/if}
   </MapLibre>
 {/if}

@@ -1,5 +1,6 @@
 import { goto } from "$app/navigation";
 import { page } from "$app/state";
+import { decodeBase32, encodeBase32 } from "geohashing";
 import pkg from "pg-tsquery";
 const { Tsquery } = pkg;
 
@@ -52,4 +53,14 @@ export const cleanTrigramQuery = (query: string): string | null => {
     .trim();
 
   return cleaned.length > 0 ? cleaned : null;
+};
+
+export const geohashToLatLng = (hash:string) => {
+  if(hash)  return decodeBase32(hash)
+    return null
+};
+
+export const latLngToGeohash = (lat:number, lng:number) => {
+  if(lat && lng)  return encodeBase32(lat, lng)
+    return null
 };
