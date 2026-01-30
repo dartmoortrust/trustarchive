@@ -5,7 +5,6 @@ import path from "path";
 import fs from "fs/promises";
 import sharp from "sharp";
 import * as XLSX from "xlsx";
-import { sql } from "bun";
 
 const STORAGE_ROOT = "/home/jamie/Code/output/";
 const LOG_PATH = "./logs/import_log.csv";
@@ -41,10 +40,10 @@ export const POST: RequestHandler = async ({ request }) => {
 
     // 3. Validate Headers against DB
     const xlsHeaders = Object.keys(rows[0] || {});
-    const dbColumns = await sql`
+    const dbColumns = await Bun.sql`
             SELECT column_name FROM information_schema.columns WHERE table_name = ${TABLE_NAME}
         `;
-    const dbColumnNames = dbColumns.map((c) => c.column_name);
+    const dbColumnNames = dbColumns.map((c:any) => c.column_name);
     const missing = xlsHeaders.filter((h) => !dbColumnNames.includes(h));
 
     if (missing.length > 0) {
@@ -104,7 +103,7 @@ export const POST: RequestHandler = async ({ request }) => {
           file_path: filePath,
         };
 
-        await sql`
+        await Bun.sql`
                     INSERT INTO ${sql(TABLE_NAME)} ${sql(record)}
                     ON CONFLICT (sha1_hash) DO UPDATE SET ${sql(record)}
                 `;

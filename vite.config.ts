@@ -6,10 +6,7 @@ export default defineConfig({
   plugins: [tailwindcss(), sveltekit()],
   build: {
     rollupOptions: {
-      external: ["bun"],
+      external: ["bun", /^bun:.*/, "crypto", "path", "fs/promises"],
     },
-  },
-  server: {
-    hmr: true,
   },
 });

@@ -1,7 +1,6 @@
-import { sql } from "bun";
 
 export async function GET() {
-    const pages = await sql`SELECT id from files order by id asc`
+    const pages = await Bun.sql`SELECT id from files order by id asc`
     console.log(pages)
 	return new Response(
 		`

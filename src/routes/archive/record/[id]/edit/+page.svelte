@@ -56,8 +56,6 @@
     }
   };
 
-  $inspect(updateRecord.fields.value());
-
   const handleOSGridSearch = (e: Event) => {
     e.preventDefault();
     try {

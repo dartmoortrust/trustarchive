@@ -1,5 +1,12 @@
 import * as v from 'valibot';
 
+// Helper for coercion that avoids 'null' in the input type
+const coerceNumber = v.pipe(
+  v.union([v.string(), v.number()]), // Removed v.null() from here
+  v.transform(val => (val === '' || val === 'unknown' ? undefined : Number(val))),
+  v.optional(v.number()) // Changed to optional
+);
+
 export const recordSchema = v.object({
   id: v.string(),
   title: v.pipe(
@@ -12,28 +19,10 @@ export const recordSchema = v.object({
   caption_back: v.string(),
   original_id: v.string(),
   
-  // Date fields simplified: Allow string/null, transform empty strings to null
-  date_day: v.nullable(
-    v.pipe(
-      v.union([v.string(), v.number()]),
-      v.transform(val => (val === '' || val === 'unknown' ? null : val)),
-      v.nullable(v.pipe(v.any(), v.toNumber(), v.minValue(1), v.maxValue(31)))
-    )
-  ),
-  date_month: v.nullable(
-    v.pipe(
-      v.union([v.string(), v.number()]),
-      v.transform(val => (val === '' || val === 'unknown' ? null : val)),
-      v.nullable(v.pipe(v.any(), v.toNumber(), v.minValue(1), v.maxValue(12)))
-    )
-  ),
-  date_year: v.optional(
-    v.pipe(
-      v.union([v.string(), v.number()]),
-      v.transform(val => (val === '' || val === 'unknown' ? null : val)),
-      v.nullable(v.pipe(v.any(), v.toNumber(), v.minValue(1800), v.maxValue(2026)))
-    )
-  ),
+  // Use optional() to satisfy RemoteFormInput types
+  date_day: v.pipe(coerceNumber, v.optional(v.pipe(v.number(), v.minValue(1), v.maxValue(31)))),
+  date_month: v.pipe(coerceNumber, v.optional(v.pipe(v.number(), v.minValue(1), v.maxValue(12)))),
+  date_year: v.pipe(coerceNumber, v.optional(v.pipe(v.number(), v.minValue(1800), v.maxValue(2026)))),
 
   transform: v.object({
     r: v.optional(v.number(), 0),
@@ -45,12 +34,12 @@ export const recordSchema = v.object({
   detail: v.string(),
   public: v.optional(v.boolean(), false),
   downloadable: v.optional(v.boolean(), false),
-  notes: v.string(),
+  notes: v.optional(v.string(), ""),
 
-  // GEOHASH FIX: Explicitly allow null for your "Remove Marker" logic
-  geohash: v.nullable(v.pipe(
-      v.union([v.string(), v.null()]),
-      v.transform(val => (val === '' || val === 'unknown' ? null : val)),
-    )), 
+  // GEOHASH: Changed to optional string
+  geohash: v.pipe(
+    v.optional(v.string()), 
+    v.transform(val => (val === '' || val === 'unknown' ? undefined : val))
+  ),
   location_name: v.optional(v.string(), "")
 });
