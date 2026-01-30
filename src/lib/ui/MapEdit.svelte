@@ -21,6 +21,14 @@
 >
   {#if coords}
     <MarkerInfo lat={coords.lat} lng={coords.lng} />
-    <DefaultMarker lngLat={[coords.lng, coords.lat]} />
+    <DefaultMarker
+      lngLat={[coords.lng, coords.lat]}
+      draggable
+      ondragend={(e) => {
+        console.log(e.lngLat);
+        let geohash = latLngToGeohash(e.lngLat[0], e.lngLat[1]);
+        updateRecord.fields.geohash.set(geohash);
+      }}
+    />
   {/if}
 </MapLibre>

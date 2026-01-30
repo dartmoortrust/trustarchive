@@ -94,7 +94,10 @@
             <DownloadButton {record} />
             <EditButton {record} />
           </div>
-          <Markdown md={record.detail || ""} />
+          <Markdown
+            md={record.detail ||
+              "If you can tell us more about this record please email secretary@dartmoortrust.org"}
+          />
         </Flex>
         <Flex>
           {#if record.mime_type.startsWith("audio")}

@@ -185,6 +185,7 @@ export const updateRecord = form(recordSchema, async (recordData) => {
             original_id = ${recordData.original_id},
             downloadable = ${recordData.downloadable},
             location_geom = ST_GeomFromGeoHash(${recordData.geohash}),
+            location_name = ${recordData.location_name},
             public = ${recordData.public},
             transform = ${recordData.transform}::json
         WHERE id = ${recordData.id}
