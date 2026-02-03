@@ -4,145 +4,220 @@ import { createHash } from "crypto";
 import path from "path";
 import fs from "fs/promises";
 import sharp from "sharp";
-import * as XLSX from "xlsx";
+import { sql } from "bun";
 
 const STORAGE_ROOT = "/home/jamie/Code/output/";
 const LOG_PATH = "./logs/import_log.csv";
 const TABLE_NAME = "files";
 
 export const POST: RequestHandler = async ({ request }) => {
-  try {
-    const formData = await request.formData();
-    const localDir = formData.get("localDir") as string;
-    const collectionId = formData.get("collectionId") as string;
+  const encoder = new TextEncoder();
 
-    if (!localDir)
-      return json({ error: "localDir is required" }, { status: 400 });
-
-    // 1. Find the XLS file in the source path
-    const filesInDir = await fs.readdir(localDir);
-    const xlsFileName = filesInDir.find(
-      (f) => f.endsWith(".xlsx") || f.endsWith(".xls"),
-    );
-
-    if (!xlsFileName) {
-      return json(
-        { error: "No XLS file found in the source directory" },
-        { status: 400 },
-      );
-    }
-
-    // 2. Parse the XLS metadata
-    const xlsPath = path.join(localDir, xlsFileName);
-    const workbook = XLSX.readFile(xlsPath);
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const rows = XLSX.utils.sheet_to_json(sheet) as any[];
-
-    // 3. Validate Headers against DB
-    const xlsHeaders = Object.keys(rows[0] || {});
-    const dbColumns = await Bun.sql`
-            SELECT column_name FROM information_schema.columns WHERE table_name = ${TABLE_NAME}
-        `;
-    const dbColumnNames = dbColumns.map((c:any) => c.column_name);
-    const missing = xlsHeaders.filter((h) => !dbColumnNames.includes(h));
-
-    if (missing.length > 0) {
-      return json(
-        { error: `DB missing columns: ${missing.join(", ")}` },
-        { status: 400 },
-      );
-    }
-
-    const results = [];
-
-    // 4. Process assets listed in XLS
-    for (const row of rows) {
-      const fileName = row.file_name;
-      if (!fileName) continue;
-
-      const filePath = path.join(localDir, fileName);
-      let status = "success";
-      let errorMsg = "";
-      let fileHash = "";
+  const stream = new ReadableStream({
+    async start(controller) {
+      const sendUpdate = async (data: object, isFirst = false) => {
+        let payload = `data: ${JSON.stringify(data)}\n\n`;
+        if (isFirst) {
+          payload = ": " + " ".repeat(1024) + "\n" + payload;
+        }
+        controller.enqueue(encoder.encode(payload));
+        await Bun.sleep(5); 
+      };
 
       try {
-        const fileHandle = Bun.file(filePath);
-        if (!(await fileHandle.exists())) throw new Error("File not found");
+        const formData = await request.formData();
+        const localDir = formData.get("localDir") as string;
+        const collectionId = formData.get("collectionId") as string;
 
-        const fileBuffer = await fileHandle.arrayBuffer();
-        fileHash = createHash("sha1")
-          .update(Buffer.from(fileBuffer))
-          .digest("hex");
-        const mimeType = fileHandle.type;
-
-        // Storage path logic (e.g., ab/hash)
-        const subDir = fileHash.substring(0, 2);
-        let masterDir = path.join(STORAGE_ROOT, "/master/", subDir);
-        await fs.mkdir(masterDir, { recursive: true });
-
-        // Save Original
-        await Bun.write(path.join(masterDir, fileHash), fileBuffer);
-
-        // Save WebP version if image
-        const webDir = path.join(STORAGE_ROOT, "/web/", subDir);
-        await fs.mkdir(webDir, { recursive: true });
-
-        if (mimeType.startsWith("image/")) {
-          await sharp(Buffer.from(fileBuffer))
-            .resize({ width: 1000, withoutEnlargement: true })
-            .webp({ quality: 80 })
-            .toFile(path.join(webDir, `w-${fileHash}`));
+        if (!collectionId) {
+          await sendUpdate({ error: "collectionId is missing" }, true);
+          return controller.close();
         }
 
-        // 5. Database Upsert
-        const record = {
-          ...row,
-          sha1_hash: fileHash,
-          mime_type: mimeType,
-          collection_id: collectionId,
-          file_path: filePath,
-        };
+        await sendUpdate({ status: "initializing", path: localDir }, true);
 
-        await Bun.sql`
-                    INSERT INTO ${sql(TABLE_NAME)} ${sql(record)}
-                    ON CONFLICT (sha1_hash) DO UPDATE SET ${sql(record)}
-                `;
-      } catch (err: any) {
-        status = "failure";
-        errorMsg = err.message;
+        // 1. Directory Check
+        const filesInDir = await fs.readdir(localDir);
+        await sendUpdate({ status: "directory_scanned", count: filesInDir.length });
+
+        // 2. Locate CSV
+        const csvFileName = filesInDir.find((f) => f.endsWith(".csv"));
+        if (!csvFileName) {
+          await sendUpdate({ error: "No CSV file found." });
+          return controller.close();
+        }
+
+        const csvPath = path.join(localDir, csvFileName);
+        
+        // 3. Native CSV Parsing
+        let rows: any[] = [];
+        try {
+          await sendUpdate({ status: "parsing_csv", file: csvFileName });
+          const csvText = await Bun.file(csvPath).text();
+          const lines = csvText.split(/\r?\n/).filter(line => line.trim() !== "");
+          
+          const parseCSVLine = (line: string) => {
+            const result = [];
+            let cur = "";
+            let inQuote = false;
+            for (let i = 0; i < line.length; i++) {
+              const char = line[i];
+              if (char === '"') inQuote = !inQuote;
+              else if (char === ',' && !inQuote) {
+                result.push(cur.trim());
+                cur = "";
+              } else cur += char;
+            }
+            result.push(cur.trim());
+            return result;
+          };
+
+          const headers = parseCSVLine(lines[0]);
+          rows = lines.slice(1).map(line => {
+            const values = parseCSVLine(line);
+            const obj: any = {};
+            headers.forEach((h, i) => obj[h] = values[i]);
+            return obj;
+          }).filter(r => r.file_name);
+          
+          await sendUpdate({ status: "metadata_extracted", rowCount: rows.length });
+        } catch (e: any) {
+          await sendUpdate({ error: `CSV Parse Error: ${e.message}` });
+          return controller.close();
+        }
+
+        // 4. DB Schema Introspection (Getting types)
+        await sendUpdate({ status: "introspecting_db_types" });
+        const schemaInfo = await Bun.sql`
+          SELECT column_name, data_type 
+          FROM information_schema.columns 
+          WHERE table_name = ${TABLE_NAME}
+        `;
+        
+        // Map types for easy lookup
+        const typeMap = new Map(schemaInfo.map(c => [c.column_name, c.data_type]));
+
+        const results = [];
+        await sendUpdate({ status: "processing_files" });
+
+        // 5. Processing Loop
+        for (let i = 0; i < rows.length; i++) {
+          const row = rows[i];
+          const fileName = row.file_name;
+          if (!fileName) continue;
+
+          try {
+            const filePath = path.join(localDir, fileName);
+            const fileHandle = Bun.file(filePath);
+            
+            if (!(await fileHandle.exists())) throw new Error(`File not found: ${fileName}`);
+
+            const imgBuffer = await fileHandle.arrayBuffer();
+            const fileHash = createHash("sha1").update(Buffer.from(imgBuffer)).digest("hex");
+            const mimeType = fileHandle.type;
+
+            // Storage logic
+            const subDir = fileHash.substring(0, 2);
+            const masterDir = path.join(STORAGE_ROOT, "master", subDir);
+            await fs.mkdir(masterDir, { recursive: true });
+            await Bun.write(path.join(masterDir, fileHash), imgBuffer);
+
+            if (mimeType.startsWith("image/")) {
+              const webDir = path.join(STORAGE_ROOT, "web", subDir);
+              await fs.mkdir(webDir, { recursive: true });
+              await sharp(Buffer.from(imgBuffer))
+                .resize({ width: 1000, withoutEnlargement: true })
+                .webp({ quality: 80 })
+                .toFile(path.join(webDir, `w-${fileHash}`));
+            }
+
+            // 6. DYNAMIC TYPE CASTING
+            const record: any = {};
+            for (const [colName, dataType] of typeMap) {
+              const rawValue = row[colName];
+
+              // Skip columns not present in the CSV row unless they are our manual overrides
+              if (rawValue === undefined) continue;
+
+              // Handle Integer/Numeric casting
+              if (dataType.includes("int") || dataType.includes("numeric") || dataType.includes("double")) {
+                const num = Number(rawValue);
+                record[colName] = isNaN(num) || rawValue === "" ? null : num;
+              } 
+              // Handle Boolean casting
+              else if (dataType.includes("bool")) {
+                record[colName] = rawValue.toLowerCase() === "true" || rawValue === "1";
+              }
+              // Default to String
+              else {
+                record[colName] = rawValue === "" ? null : rawValue;
+              }
+            }
+
+            // Explicit overrides
+            record.sha1_hash = fileHash;
+            record.mime_type = mimeType;
+            record.collection_id = collectionId;
+            record.file_path = filePath;
+
+            await Bun.sql`
+              INSERT INTO ${sql(TABLE_NAME)} ${sql(record)} 
+              ON CONFLICT (sha1_hash) DO UPDATE SET ${sql(record)}
+            `;
+            
+            results.push({ fileName, status: "success", fileHash });
+          } catch (err: any) {
+            results.push({ fileName, status: "failure", errorMsg: err.message });
+          }
+
+          await sendUpdate({ 
+            status: "progress", 
+            current: i + 1, 
+            total: rows.length, 
+            lastProcessed: fileName 
+          });
+        }
+
+        // Final Count Check
+        const verifyCount = await Bun.sql`
+           SELECT COUNT(*) FROM ${sql(TABLE_NAME)} WHERE collection_id = ${collectionId}
+        `;
+        
+        await logToCsv(results);
+        await sendUpdate({ 
+          status: "complete", 
+          dbVerifyCount: verifyCount[0].count,
+          summary: { total: rows.length, success: results.filter(r=>r.status==='success').length } 
+        });
+        controller.close();
+        
+      } catch (error: any) {
+        console.error("Endpoint Panic:", error);
+        await sendUpdate({ error: `CRITICAL: ${error.message}` });
+        controller.close();
       }
-      results.push({ fileName, fileHash, status, errorMsg });
     }
+  });
 
-    // 6. Final Log
-    await logToCsv(results);
-
-    return json({
-      message: "Import complete",
-      total: rows.length,
-      success: results.filter((r) => r.status === "success").length,
-    });
-  } catch (error: any) {
-    return json({ error: error.message }, { status: 500 });
-  }
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache, no-transform",
+      "Connection": "keep-alive",
+      "X-Accel-Buffering": "no",
+    },
+  });
 };
 
 async function logToCsv(results: any[]) {
-  await fs.mkdir(path.dirname(LOG_PATH), { recursive: true });
-  const logFile = Bun.file(LOG_PATH);
-  const header = "timestamp,filename,hash,status,error\n";
-  const newRows =
-    results
-      .map(
-        (r) =>
-          `${new Date().toISOString()},"${r.fileName}","${r.fileHash}","${r.status}","${r.errorMsg}"`,
-      )
-      .join("\n") + "\n";
-
-  if (!(await logFile.exists())) {
-    await Bun.write(LOG_PATH, header + newRows);
-  } else {
-    const existing = await logFile.text();
-    await Bun.write(LOG_PATH, existing + newRows);
+  try {
+    await fs.mkdir(path.dirname(LOG_PATH), { recursive: true });
+    if (!(await Bun.file(LOG_PATH).exists())) {
+      await Bun.write(LOG_PATH, "timestamp,filename,hash,status,error\n");
+    }
+    const newRows = results.map(r => `${new Date().toISOString()},"${r.fileName}","${r.fileHash || ''}","${r.status}","${r.errorMsg || ''}"\n`).join("");
+    await fs.appendFile(LOG_PATH, newRows);
+  } catch (e) {
+    console.error("Logger Failed:", e);
   }
 }

@@ -1,6 +1,6 @@
 import { form, getRequestEvent, query } from "$app/server";
 import { recordSchema } from "$lib/schema";
-import { error } from "@sveltejs/kit";
+import { error, redirect } from "@sveltejs/kit";
 import { getSignedUrl } from "$lib/server/files";
 import { cleanTrigramQuery, parseSearchQuery } from "$lib/tools";
 import { DATABASE_URL } from "$env/static/private";
@@ -193,6 +193,7 @@ export const updateRecord = form(recordSchema, async (recordData) => {
       `;
     });
     console.log("Record Saved")
+
     return { success: true };
   } catch (e) {
     console.log(e);

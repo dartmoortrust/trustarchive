@@ -35,9 +35,9 @@
     label: String(i + 1),
   }));
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => ({
-    value: String(1900 + i),
-    label: String(1900 + i),
+  const years = Array.from({ length: currentYear - 1850 + 1 }, (_, i) => ({
+    value: String(1850 + i),
+    label: String(1850 + i),
   })).reverse();
 
   // Search logic
@@ -240,7 +240,7 @@
 
         <h2>Mapped Location</h2>
         <MapEdit {updateRecord} />
-        <button onclick={() => updateRecord.fields.geohash.set()}
+        <button onclick={() => updateRecord.fields.geohash.set("")}
           >Clear Marker</button
         >
         <HelperBox
@@ -312,7 +312,11 @@
         {#each updateRecord.fields.notes.issues() as issue}
           <p class="issue">{issue.message}</p>
         {/each}
-
+        <HelperBox
+          >The notes section is to record anything of use to the rest of the
+          Dartmoor Trust Archive team. It is not searched nor shared with the
+          public.</HelperBox
+        >
         <div class="flex gap-10">
           <label>
             <h2>Downloadable</h2>

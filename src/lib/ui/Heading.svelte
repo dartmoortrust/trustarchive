@@ -4,19 +4,38 @@
 
 {#if text}
   {#if level === 3}
-    <h3 class="text-gray-800 text-xl">{text}</h3>
+    <h3>{text}</h3>
   {:else if level === 2}
-    <h2 class={`text-gray-800 text-3xl font-bold ${light ? "text-white" : ""}`}>
+    <h2>
       {text}
     </h2>
   {:else}
-    <h1
-      class={`text-gray-800 font-bold mb-3 text-4xl md:text-5xl ${light ? "text-white" : ""}`}
-    >
+    <h1>
       {text}
     </h1>
   {/if}
   {#if subtitle}
-    <p class="text-lg">{subtitle}</p>
+    <p class="subtitle">{subtitle}</p>
   {/if}
 {/if}
+
+<style>
+  h1 {
+    font-size: 3em;
+    font-weight: 900;
+    color: rgb(31, 31, 31);
+  }
+  h2 {
+    font-size: 2em;
+    font-weight: 900;
+    color: rgb(31, 31, 31);
+  }
+  h3 {
+    font-size: 1em;
+    font-weight: 900;
+    color: rgb(31, 31, 31);
+  }
+  .subtitle {
+    font-size: 1em;
+  }
+</style>

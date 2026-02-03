@@ -2,6 +2,8 @@
   import Container from "$lib/ui/Container.svelte";
   import Flex from "$lib/ui/Flex.svelte";
   import Heading from "$lib/ui/Heading.svelte";
+  import Link from "$lib/ui/Link.svelte";
+  import { text } from "@sveltejs/kit";
 
   const urls = [
     {
@@ -112,8 +114,8 @@
   <Flex>
     <Heading text="Links" />
     <Flex space={1}>
-      {#each urls as url}
-        <a href={url.url}>{url.title}</a>
+      {#each urls as { url, title }}
+        <Link href={url} text={title} icon={false} />
       {/each}
     </Flex>
   </Flex>
